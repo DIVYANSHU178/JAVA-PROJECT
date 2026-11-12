@@ -46,6 +46,7 @@ public class ReservationServer {
 
         // Booking, PNR, & Cancellation
         server.createContext("/api/book", new BookingHandler());
+        server.createContext("/api/bookings/create", new BookingHandler());
         server.createContext("/api/pnr", new PnrStatusHandler());
         server.createContext("/api/cancel", new CancelTicketHandler());
         server.createContext("/api/stats", new StatsHandler());
@@ -124,6 +125,7 @@ public class ReservationServer {
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
             String query = params.get("query");
+            if (query == null || query.isBlank()) query = params.get("q");
             if (query == null || query.isBlank()) query = params.get("trainNumber");
             String from = params.get("from");
             String to = params.get("to");
@@ -360,7 +362,13 @@ public class ReservationServer {
                     String gender = JsonUtil.extractString(obj, "gender");
                     String berth = JsonUtil.extractString(obj, "berthPreference");
                     int seatNumber = JsonUtil.extractInt(obj, "seatNumber", 0);
+                    if (seatNumber <= 0) {
+                        seatNumber = JsonUtil.extractInt(obj, "preferredSeatNumber", 0);
+                    }
                     String coach = JsonUtil.extractString(obj, "coach");
+                    if (coach == null || coach.isBlank()) {
+                        coach = JsonUtil.extractString(obj, "preferredCoach");
+                    }
 
                     if (name != null && !name.isBlank()) {
                         list.add(new BookingDAO.PassengerRequest(

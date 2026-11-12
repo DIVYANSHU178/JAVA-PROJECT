@@ -40,44 +40,49 @@ public class TrainDAO {
         String tCode = toCode.trim().toUpperCase();
         String q = (quota == null || quota.isBlank()) ? "GENERAL" : quota.trim().toUpperCase();
 
-        // 1. Route-stops query handles both direct origin-dest and intermediate stops accurately
-        String sql = """
-            SELECT 
-                t.train_number, t.train_name, t.train_type, t.zone,
-                s1.station_code AS board_code, s1.station_name AS board_name, s1.departure_time AS board_dep,
-                s2.station_code AS dest_code, s2.station_name AS dest_name, s2.arrival_time AS dest_arr,
-                (s2.stop_sequence - s1.stop_sequence) AS stop_diff,
-                t.distance_km, t.duration_h, t.duration_m,
-                t.has_1a, t.has_2a, t.has_3a, t.has_sl, t.has_cc,
-                t.fare_1a, t.fare_2a, t.fare_3a, t.fare_sl, t.fare_cc
-            FROM train_route_stops s1
-            JOIN train_route_stops s2 
-                ON s1.train_number = s2.train_number 
-                AND s1.stop_sequence < s2.stop_sequence
-            JOIN trains t 
-                ON t.train_number = s1.train_number
-            WHERE s1.station_code = ? AND s2.station_code = ?
-            ORDER BY s1.departure_time ASC
-            LIMIT 50;
-        """;
-
         Set<String> seen = new HashSet<>();
 
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            List<String> fromCodes = resolveStationCodes(conn, fCode);
+            List<String> toCodes = resolveStationCodes(conn, tCode);
 
-            ps.setString(1, fCode);
-            ps.setString(2, tCode);
+            // 1. Route-stops query handles both direct origin-dest and intermediate stops accurately with cluster support
+            String sql = """
+                SELECT 
+                    t.train_number, t.train_name, t.train_type, t.zone,
+                    s1.station_code AS board_code, s1.station_name AS board_name, s1.departure_time AS board_dep,
+                    s2.station_code AS dest_code, s2.station_name AS dest_name, s2.arrival_time AS dest_arr,
+                    (s2.stop_sequence - s1.stop_sequence) AS stop_diff,
+                    t.distance_km, t.duration_h, t.duration_m,
+                    t.has_1a, t.has_2a, t.has_3a, t.has_sl, t.has_cc,
+                    t.fare_1a, t.fare_2a, t.fare_3a, t.fare_sl, t.fare_cc
+                FROM train_route_stops s1
+                JOIN train_route_stops s2 
+                    ON s1.train_number = s2.train_number 
+                    AND s1.stop_sequence < s2.stop_sequence
+                JOIN trains t 
+                    ON t.train_number = s1.train_number
+                WHERE s1.station_code = ANY (?) AND s2.station_code = ANY (?)
+                ORDER BY s1.departure_time ASC
+                LIMIT 60;
+            """;
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String tnum = rs.getString("train_number");
-                    seen.add(tnum);
-                    list.add(mapTrainResult(conn, rs, date, q));
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setArray(1, conn.createArrayOf("varchar", fromCodes.toArray(new String[0])));
+                ps.setArray(2, conn.createArrayOf("varchar", toCodes.toArray(new String[0])));
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String tnum = rs.getString("train_number");
+                        if (!seen.contains(tnum)) {
+                            seen.add(tnum);
+                            list.add(mapTrainResult(conn, rs, date, q));
+                        }
+                    }
                 }
             }
 
-            // 2. Fallback check on direct trains table if not covered in route stops
+            // 2. Direct trains fallback query
             if (list.size() < 10) {
                 String directSql = """
                     SELECT 
@@ -89,12 +94,12 @@ public class TrainDAO {
                         has_1a, has_2a, has_3a, has_sl, has_cc,
                         fare_1a, fare_2a, fare_3a, fare_sl, fare_cc
                     FROM trains
-                    WHERE from_station_code = ? AND to_station_code = ?
-                    LIMIT 20;
+                    WHERE from_station_code = ANY (?) AND to_station_code = ANY (?)
+                    LIMIT 30;
                 """;
                 try (PreparedStatement directPs = conn.prepareStatement(directSql)) {
-                    directPs.setString(1, fCode);
-                    directPs.setString(2, tCode);
+                    directPs.setArray(1, conn.createArrayOf("varchar", fromCodes.toArray(new String[0])));
+                    directPs.setArray(2, conn.createArrayOf("varchar", toCodes.toArray(new String[0])));
                     try (ResultSet drs = directPs.executeQuery()) {
                         while (drs.next()) {
                             String tnum = drs.getString("train_number");
@@ -112,6 +117,35 @@ public class TrainDAO {
         }
 
         return list;
+    }
+
+    public static List<String> resolveStationCodes(Connection conn, String codeOrCity) {
+        List<String> codes = new ArrayList<>();
+        if (codeOrCity == null || codeOrCity.isBlank()) return codes;
+        String term = codeOrCity.trim().toUpperCase();
+        codes.add(term);
+
+        String clusterSql = """
+            SELECT DISTINCT c2.station_code 
+            FROM city_station_clusters c1
+            JOIN city_station_clusters c2 ON c1.city_name = c2.city_name
+            WHERE c1.station_code = ? OR UPPER(c1.city_name) = ?
+        """;
+        try (PreparedStatement ps = conn.prepareStatement(clusterSql)) {
+            ps.setString(1, term);
+            ps.setString(2, term);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String sc = rs.getString("station_code");
+                    if (!codes.contains(sc)) {
+                        codes.add(sc);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            // table might not exist or error, fallback to term
+        }
+        return codes;
     }
 
     private static Map<String, Object> mapTrainResult(Connection conn, ResultSet rs, String date, String quota) throws SQLException {
