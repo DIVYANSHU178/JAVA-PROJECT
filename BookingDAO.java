@@ -29,6 +29,22 @@ public class BookingDAO {
             String toStationCode,
             List<PassengerRequest> passengers
     ) throws Exception {
+        return bookTicket(null, trainNumber, journeyDate, classType, quota, fromStationCode, toStationCode, passengers, "UPI", "PAY-" + System.currentTimeMillis(), false);
+    }
+
+    public static Map<String, Object> bookTicket(
+            Integer userId,
+            String trainNumber,
+            String journeyDate,
+            String classType,
+            String quota,
+            String fromStationCode,
+            String toStationCode,
+            List<PassengerRequest> passengers,
+            String paymentMethod,
+            String paymentId,
+            boolean insuranceOpted
+    ) throws Exception {
 
         if (passengers == null || passengers.isEmpty()) {
             throw new IllegalArgumentException("At least one passenger is required");
@@ -70,6 +86,9 @@ public class BookingDAO {
 
                 double unitFare = TrainDAO.calculateFareForQuota(baseFare, q, cType);
                 double totalFare = unitFare * passengers.size();
+                if (insuranceOpted) {
+                    totalFare += 0.35 * passengers.size();
+                }
 
                 // 2. Lock & count existing bookings for this train, date, and class
                 String countSql = """
@@ -120,21 +139,25 @@ public class BookingDAO {
 
                 // 3. Insert Master Booking Record
                 String insertBookingSql = """
-                    INSERT INTO bookings (pnr, train_number, train_name, journey_date, from_station_code, from_station_name, to_station_code, to_station_name, class_type, quota, total_fare, booking_status)
-                    VALUES (?, ?, ?, ?::date, ?, ?, ?, ?, ?, ?, ?, 'CONFIRMED');
+                    INSERT INTO bookings (pnr, user_id, train_number, train_name, journey_date, from_station_code, from_station_name, to_station_code, to_station_name, class_type, quota, total_fare, booking_status, payment_method, payment_id, insurance_opted)
+                    VALUES (?, ?, ?, ?, ?::date, ?, ?, ?, ?, ?, ?, ?, 'CONFIRMED', ?, ?, ?);
                 """;
                 try (PreparedStatement ps = conn.prepareStatement(insertBookingSql)) {
                     ps.setString(1, pnr);
-                    ps.setString(2, trainNumber);
-                    ps.setString(3, trainName);
-                    ps.setString(4, journeyDate);
-                    ps.setString(5, fromStationCode);
-                    ps.setString(6, fromName);
-                    ps.setString(7, toStationCode);
-                    ps.setString(8, toName);
-                    ps.setString(9, cType);
-                    ps.setString(10, q);
-                    ps.setDouble(11, totalFare);
+                    if (userId != null && userId > 0) ps.setInt(2, userId); else ps.setNull(2, Types.INTEGER);
+                    ps.setString(3, trainNumber);
+                    ps.setString(4, trainName);
+                    ps.setString(5, journeyDate);
+                    ps.setString(6, fromStationCode);
+                    ps.setString(7, fromName);
+                    ps.setString(8, toStationCode);
+                    ps.setString(9, toName);
+                    ps.setString(10, cType);
+                    ps.setString(11, q);
+                    ps.setDouble(12, totalFare);
+                    ps.setString(13, paymentMethod != null ? paymentMethod : "UPI");
+                    ps.setString(14, paymentId != null ? paymentId : "PAY-SIM");
+                    ps.setBoolean(15, insuranceOpted);
                     ps.executeUpdate();
                 }
 
