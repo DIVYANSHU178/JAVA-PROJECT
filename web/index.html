@@ -428,7 +428,7 @@
             <div class="header-actions">
                 <div class="pill-badge">
                     <span class="radar-dot"></span>
-                    <span id="header-db-status">PostgreSQL 18 Live (8,990 Stations • 13,500+ Trains • 165,000+ Commercial Halts)</span>
+                    <span id="header-db-status">PostgreSQL 18 Live (8,990 Stations • 14,300+ Trains • 170,000+ Halts)</span>
                 </div>
                 <button type="button" class="btn-account-pill" onclick="openUserModal()">
                     <span id="user-header-label">👤 Login / Account</span>
@@ -475,7 +475,7 @@
                 <div class="search-hero-top">
                     <div class="search-title">
                         <h2>Indian Railway Reservation Portal</h2>
-                        <p>Search over 13,500+ Passenger Trains, 8,990 Stations & 165,000+ Scheduled Halts</p>
+                        <p>Search over 14,300+ Passenger Trains, 8,990 Stations & 170,000+ Scheduled Halts</p>
                     </div>
 
                     <!-- Dual Mode Switcher -->
@@ -570,7 +570,7 @@
 
                 <div style="display: flex; gap: 14px; max-width: 720px; margin-bottom: 24px; flex-wrap: wrap;">
                     <div style="flex: 2; min-width: 260px; position: relative;">
-                        <input type="text" id="ntes-train-query" class="input-floating-group" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; font-weight: 700;" placeholder="Train No or Name (e.g. 12002, 12951, Vande Bharat)" value="12002" autocomplete="off" oninput="handleNtesTrainInput()">
+                        <input type="text" id="ntes-train-query" class="input-floating-group" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; font-weight: 700;" placeholder="Train No or Name (e.g. 22191, 12002, 22691, Vande Bharat)" value="22191" autocomplete="off" oninput="handleNtesTrainInput()" onkeydown="if(event.key==='Enter'){document.getElementById('ntes-train-dropdown').style.display='none'; fetchLiveStatus();}">
                         <div id="ntes-train-dropdown" class="autocomplete-dropdown"></div>
                     </div>
                     <select id="ntes-day-offset" style="flex: 1; min-width: 180px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.92rem; font-weight: 600;">
