@@ -3,428 +3,518 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RailStay IRCTC Portal — Complete Indian Railway Booking & Travel Suite</title>
+    <title>RailStay IRCTC NextGen — Indian Railways Official Reservation & Live Tracking Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a;
-            --primary-dark: #0f172a;
-            --primary-light: #2563eb;
+            --primary: #0b2545;
+            --primary-mid: #133c70;
+            --primary-light: #1d4ed8;
             --accent: #ea580c;
             --accent-hover: #c2410c;
-            --success: #10b981;
-            --success-bg: #ecfdf5;
-            --warning: #f59e0b;
-            --warning-bg: #fffbeb;
-            --danger: #ef4444;
-            --danger-bg: #fef2f2;
-            --bg-body: #f8fafc;
+            --accent-soft: #fff7ed;
+            --success: #059669;
+            --success-soft: #ecfdf5;
+            --warning: #d97706;
+            --warning-soft: #fffbeb;
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+            --bg-body: #f1f5f9;
             --surface: #ffffff;
+            --surface-subtle: #f8fafc;
             --border: #e2e8f0;
+            --border-strong: #cbd5e1;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08);
-            --shadow-lg: 0 12px 32px -5px rgba(0,0,0,0.12);
+            --radius-md: 14px;
+            --radius-lg: 22px;
+            --shadow-subtle: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 16px 36px -6px rgba(11, 37, 69, 0.16);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
         body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* Top Header */
+        /* Top Government Bar */
+        .gov-banner {
+            background: #030d1a; color: #94a3b8; font-size: 0.72rem; padding: 6px 24px;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .gov-banner a { color: #cbd5e1; text-decoration: none; font-weight: 600; }
+
+        /* Header Navbar */
         header {
-            background: linear-gradient(135deg, #09122c 0%, #172554 100%);
+            background: linear-gradient(135deg, #07162c 0%, #0d284f 100%);
             color: #ffffff; box-shadow: var(--shadow-md); position: sticky; top: 0; z-index: 100;
         }
         .header-container {
-            max-width: 1260px; margin: 0 auto; padding: 12px 24px;
+            max-width: 1280px; margin: 0 auto; padding: 12px 24px;
             display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
         }
-        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
-        .brand-logo {
+        .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff; }
+        .brand-emblem {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            width: 44px; height: 44px; border-radius: var(--radius-md);
-            display: flex; align-items: center; justify-content: center; font-size: 22px;
-            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.45);
+            width: 48px; height: 48px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.5);
         }
-        .brand-text h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px; }
-        .brand-text p { font-size: 0.76rem; color: #94a3b8; font-weight: 500; }
+        .brand-text h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; }
+        .brand-text p { font-size: 0.75rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.3px; }
 
-        .header-right { display: flex; align-items: center; gap: 14px; }
-        .badge-live {
-            background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px);
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .pill-badge {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
             padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
-            display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .live-dot {
+        .radar-dot {
             width: 8px; height: 8px; border-radius: 50%; background: #10b981;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse-ring 2s infinite;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse-radar 2s infinite;
         }
-        @keyframes pulse-ring {
+        @keyframes pulse-radar {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        .user-auth-btn {
-            background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 7px 16px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 700;
+        .btn-account-pill {
+            background: rgba(255, 255, 255, 0.16); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 7px 16px; border-radius: var(--radius-sm); font-size: 0.86rem; font-weight: 700;
             cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;
         }
-        .user-auth-btn:hover { background: #ffffff; color: var(--primary-dark); }
+        .btn-account-pill:hover { background: #ffffff; color: var(--primary); }
 
-        /* Tatkal Live Alert Ribbon */
-        .tatkal-alert-strip {
-            background: #fffbeb; border-bottom: 1px solid #fde68a; color: #92400e;
-            padding: 8px 24px; font-size: 0.82rem; font-weight: 600; text-align: center;
-            display: flex; justify-content: center; align-items: center; gap: 12px;
+        /* Tatkal Flash Notification Ribbon */
+        .tatkal-flash-strip {
+            background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+            border-bottom: 1px solid #fde68a; color: #92400e; padding: 8px 24px;
+            font-size: 0.82rem; font-weight: 700; text-align: center;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
         }
 
-        /* Nav Bar */
-        .nav-wrapper { background: #ffffff; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-        .nav-container { max-width: 1260px; margin: 0 auto; padding: 0 24px; display: flex; gap: 6px; overflow-x: auto; }
+        /* Top Navigation Tabs */
+        .nav-wrapper { background: #ffffff; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-subtle); }
+        .nav-container { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 6px; overflow-x: auto; }
         .nav-btn {
             padding: 14px 18px; background: none; border: none; font-size: 0.92rem; font-weight: 600;
             color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px;
             border-bottom: 3px solid transparent; transition: all 0.2s ease; white-space: nowrap;
         }
-        .nav-btn:hover { color: var(--primary); background: #f1f5f9; }
-        .nav-btn.active { color: var(--primary); border-bottom-color: var(--accent); background: #f8fafc; font-weight: 700; }
+        .nav-btn:hover { color: var(--primary-light); background: #f8fafc; }
+        .nav-btn.active { color: var(--primary-light); border-bottom-color: var(--accent); background: #eff6ff; font-weight: 700; }
 
-        /* Main Container */
-        main { max-width: 1260px; margin: 20px auto; padding: 0 24px; width: 100%; flex: 1; }
+        /* Main Workspace Container */
+        main { max-width: 1280px; margin: 20px auto; padding: 0 24px; width: 100%; flex: 1; }
 
-        /* Card Container */
-        .card {
-            background: var(--surface); border-radius: var(--radius-lg);
-            border: 1px solid var(--border); box-shadow: var(--shadow-md);
-            padding: 24px; margin-bottom: 24px;
+        /* Hero Search Card with Dual Search Modes */
+        .search-hero-card {
+            background: linear-gradient(135deg, #0b2545 0%, #133c70 100%);
+            border-radius: var(--radius-lg); padding: 26px 30px; color: #ffffff;
+            box-shadow: var(--shadow-lg); margin-bottom: 24px; position: relative;
         }
-        .card-header {
-            margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        .search-hero-top {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
         }
-        .card-header h2 { font-size: 1.25rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; }
-        .card-header p { font-size: 0.86rem; color: var(--text-muted); margin-top: 3px; }
+        .search-title h2 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.5px; }
+        .search-title p { font-size: 0.88rem; color: #cbd5e1; margin-top: 4px; }
 
-        /* Search Bar Hero */
-        .search-hero {
-            background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%);
-            border-radius: var(--radius-lg); padding: 26px; color: #ffffff;
-            box-shadow: var(--shadow-lg); margin-bottom: 24px;
+        /* Search Mode Switcher Tabs */
+        .search-mode-switcher {
+            display: inline-flex; background: rgba(0, 0, 0, 0.25); border-radius: 999px; padding: 4px; border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .search-hero-title { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; }
-        .search-hero-subtitle { font-size: 0.88rem; color: #cbd5e1; margin-bottom: 20px; }
+        .mode-tab {
+            padding: 7px 18px; border-radius: 999px; border: none; font-size: 0.84rem; font-weight: 700;
+            color: #cbd5e1; background: none; cursor: pointer; transition: all 0.2s ease;
+        }
+        .mode-tab.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
-        .search-bar-grid {
-            display: grid; grid-template-columns: 2fr auto 2fr 1.5fr 1.5fr auto;
+        /* Route Search Grid */
+        .route-search-grid {
+            display: grid; grid-template-columns: 2fr auto 2fr 1.4fr 1.4fr auto;
             gap: 12px; align-items: flex-end;
         }
-        @media (max-width: 992px) { .search-bar-grid { grid-template-columns: 1fr; } }
+        /* Train No Search Grid */
+        .train-search-grid {
+            display: grid; grid-template-columns: 3.5fr 1.5fr 1.5fr auto;
+            gap: 14px; align-items: flex-end; display: none;
+        }
+        @media (max-width: 992px) {
+            .route-search-grid, .train-search-grid { grid-template-columns: 1fr; }
+        }
 
-        .search-input-group { position: relative; }
-        .search-input-group label {
-            display: block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+        .input-floating-group { position: relative; }
+        .input-floating-group label {
+            display: block; font-size: 0.76rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.5px; margin-bottom: 6px; color: #e2e8f0;
         }
-        .search-input-group input, .search-input-group select {
-            width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
-            border: 1px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.95);
+        .input-floating-group input, .input-floating-group select {
+            width: 100%; padding: 13px 14px; border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.98);
             color: var(--text-main); font-size: 0.95rem; font-weight: 600; outline: none;
         }
-        .search-input-group input:focus, .search-input-group select:focus {
-            background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.3);
+        .input-floating-group input:focus, .input-floating-group select:focus {
+            background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.35);
         }
 
-        .btn-swap {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        .btn-swap-stations {
+            width: 46px; height: 46px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.2s ease; margin-bottom: 2px;
         }
-        .btn-swap:hover { background: var(--accent); transform: rotate(180deg); }
+        .btn-swap-stations:hover { background: var(--accent); transform: rotate(180deg); }
 
-        .btn-search {
+        .btn-primary-action {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            color: #ffffff; border: none; padding: 13px 26px; border-radius: var(--radius-sm);
-            font-size: 0.98rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4); height: 46px;
+            color: #ffffff; border: none; padding: 14px 28px; border-radius: var(--radius-sm);
+            font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 16px rgba(234, 88, 12, 0.45); height: 48px; transition: all 0.2s ease;
         }
-        .btn-search:hover { transform: translateY(-1px); }
+        .btn-primary-action:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(234, 88, 12, 0.55); }
 
         /* Autocomplete List */
-        .autocomplete-list {
+        .autocomplete-dropdown {
             position: absolute; top: calc(100% + 4px); left: 0; right: 0;
             background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-lg); max-height: 260px; overflow-y: auto; z-index: 200; display: none;
+            box-shadow: var(--shadow-lg); max-height: 280px; overflow-y: auto; z-index: 200; display: none;
         }
-        .autocomplete-item {
-            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+        .autocomplete-option {
+            padding: 11px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
             display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
         }
-        .autocomplete-item:hover { background: #eff6ff; color: var(--primary); }
-        .code-badge {
-            background: #dbeafe; color: #1e40af; font-weight: 800; padding: 2px 8px;
+        .autocomplete-option:hover { background: #eff6ff; color: var(--primary-light); }
+        .station-code-chip {
+            background: #dbeafe; color: #1e40af; font-weight: 800; padding: 3px 8px;
             border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
         }
 
-        /* Train Results List */
+        /* Train Result Card */
         .train-result-card {
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 20px; margin-bottom: 18px;
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius-md); padding: 22px; margin-bottom: 20px;
+            box-shadow: var(--shadow-subtle); transition: all 0.2s ease;
         }
-        .train-header-row {
+        .train-result-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+
+        .train-card-header {
             display: flex; justify-content: space-between; align-items: flex-start;
-            flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
         }
-        .train-name-title { font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); }
-        .train-schedule-strip {
+        .train-title-name { font-size: 1.25rem; font-weight: 800; color: var(--primary); }
+        .train-meta-specs { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; margin-top: 3px; }
+
+        .train-route-timeline {
             display: flex; align-items: center; justify-content: space-between;
-            background: #f8fafc; padding: 12px 18px; border-radius: var(--radius-sm);
-            margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+            background: var(--surface-subtle); padding: 14px 20px; border-radius: var(--radius-sm);
+            margin-bottom: 18px; flex-wrap: wrap; gap: 14px; border: 1px solid #f1f5f9;
         }
-        .time-box h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-main); }
-        .time-box p { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
-        .route-center { text-align: center; flex: 1; min-width: 140px; }
-        .route-line-visual { height: 2px; background: #cbd5e1; position: relative; width: 75%; margin: 4px auto 0; }
-        .route-line-visual::before, .route-line-visual::after {
+        .station-time-block h3 { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+        .station-time-block p { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+        .route-distance-bar { text-align: center; flex: 1; min-width: 140px; }
+        .route-duration-text { font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 4px; }
+        .route-arrow-line { height: 2px; background: #cbd5e1; position: relative; width: 75%; margin: 0 auto; }
+        .route-arrow-line::before, .route-arrow-line::after {
             content: ''; position: absolute; top: -4px; width: 10px; height: 10px;
             border-radius: 50%; background: var(--primary);
         }
-        .route-line-visual::before { left: 0; }
-        .route-line-visual::after { right: 0; }
+        .route-arrow-line::before { left: 0; }
+        .route-arrow-line::after { right: 0; }
 
-        /* Class Tiles */
-        .classes-tiles-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 10px; margin-bottom: 14px;
+        /* Class Selection Tiles */
+        .class-tiles-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px; margin-bottom: 16px;
         }
-        .class-tile {
+        .class-tier-tile {
             border: 2px solid var(--border); border-radius: var(--radius-sm);
-            padding: 10px 12px; cursor: pointer; background: #ffffff;
-            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 12px 14px; cursor: pointer; background: #ffffff;
+            display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;
         }
-        .class-tile:hover { border-color: var(--primary-light); background: #f8fafc; }
-        .class-tile.active { border-color: var(--accent); background: #fffaf5; }
-        .class-tile-top { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
-        .class-tile-fare { color: #0f172a; font-weight: 800; font-size: 1rem; }
-        .avail-badge {
-            display: inline-block; padding: 3px 8px; border-radius: 4px;
-            font-size: 0.76rem; font-weight: 700; text-transform: uppercase;
+        .class-tier-tile:hover { border-color: var(--primary-light); background: #f8fafc; }
+        .class-tier-tile.active {
+            border-color: var(--accent); background: var(--accent-soft);
+            box-shadow: 0 0 0 1px var(--accent);
         }
-        .avail-green { background: #dcfce7; color: #15803d; }
-        .avail-amber { background: #fef3c7; color: #b45309; }
-        .avail-red { background: #fee2e2; color: #b91c1c; }
+        .class-tier-top { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
+        .class-tier-fare { color: #0f172a; font-weight: 800; font-size: 1.05rem; }
 
-        .btn-coach-map {
-            background: none; border: 1px solid var(--border); padding: 7px 14px;
-            border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600;
-            color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px;
+        .status-badge {
+            display: inline-block; padding: 4px 8px; border-radius: 4px;
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
         }
-        .btn-coach-map:hover { background: #eff6ff; border-color: var(--primary-light); }
-        .btn-book-now {
-            background: var(--accent); color: #ffffff; border: none; padding: 9px 22px;
-            border-radius: var(--radius-sm); font-size: 0.92rem; font-weight: 700; cursor: pointer;
-        }
-        .btn-book-now:hover { background: var(--accent-hover); }
+        .badge-available { background: var(--success-soft); color: var(--success); }
+        .badge-rac { background: var(--warning-soft); color: var(--warning); }
+        .badge-waitlist { background: var(--danger-soft); color: var(--danger); }
 
-        /* Master List & Passenger Form */
-        .master-pills-container {
-            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
-            background: #f1f5f9; padding: 10px 14px; border-radius: var(--radius-sm);
+        /* Train Action Buttons */
+        .train-actions-strip {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--border); padding-top: 14px; flex-wrap: wrap; gap: 10px;
         }
-        .master-pill {
-            background: #ffffff; border: 1px solid var(--border); border-radius: 999px;
-            padding: 5px 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; gap: 6px;
+        .btn-action-tool {
+            background: none; border: 1px solid var(--border); padding: 8px 16px;
+            border-radius: var(--radius-sm); font-size: 0.86rem; font-weight: 700;
+            color: var(--primary-mid); cursor: pointer; display: flex; align-items: center; gap: 6px;
         }
-        .master-pill:hover { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+        .btn-action-tool:hover { background: #eff6ff; border-color: var(--primary-light); color: var(--primary-light); }
+        .btn-book-cta {
+            background: var(--accent); color: #ffffff; border: none; padding: 11px 26px;
+            border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 800; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-book-cta:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-        .passenger-item {
-            background: #f8fafc; border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px;
+        /* Coach Seat Selection Modal & Authentic Layout */
+        .coach-container-box {
+            background: #ffffff; border-radius: var(--radius-md); padding: 20px;
         }
-        .form-grid-4 {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+        .coach-header-info {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f8fafc; padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 20px;
         }
-        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px; color: #475569; }
-        .form-control {
-            width: 100%; padding: 10px 12px; border: 1px solid var(--border);
-            border-radius: var(--radius-sm); font-size: 0.9rem; outline: none; background: #ffffff;
+        .coach-bay-wrapper {
+            background: #f1f5f9; border: 3px solid #94a3b8; border-radius: 18px;
+            padding: 24px; margin-bottom: 20px; max-height: 520px; overflow-y: auto;
         }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .coach-direction-indicator {
+            text-align: center; font-size: 0.78rem; font-weight: 800; color: #475569;
+            letter-spacing: 2px; margin-bottom: 16px; text-transform: uppercase;
+        }
+
+        /* Authentic Bay Section */
+        .coach-bay-grid {
+            display: flex; flex-direction: column; gap: 18px;
+        }
+        .coach-bay-unit {
+            background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px;
+            padding: 14px; display: grid; grid-template-columns: 3fr 1.2fr 1.5fr; gap: 14px; align-items: center;
+        }
+        .bay-compartment {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+        .bay-aisle {
+            background: #e2e8f0; border-radius: 6px; height: 100%; min-height: 70px;
+            display: flex; align-items: center; justify-content: center; font-size: 0.72rem;
+            color: #64748b; font-weight: 800; writing-mode: vertical-rl; letter-spacing: 2px;
+        }
+        .bay-side {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+        }
+
+        /* Berth Cell */
+        .berth-cell-btn {
+            border: 2px solid #cbd5e1; border-radius: 8px; padding: 10px 4px;
+            text-align: center; background: #ffffff; cursor: pointer; transition: all 0.2s ease;
+            user-select: none;
+        }
+        .berth-cell-btn:hover:not(.occupied) { border-color: var(--primary-light); transform: translateY(-2px); }
+        .berth-cell-btn.occupied {
+            background: #fee2e2; border-color: #fca5a5; color: #991b1b; cursor: not-allowed; opacity: 0.7;
+        }
+        .berth-cell-btn.selected {
+            background: #dbeafe; border-color: #2563eb; color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35); font-weight: 800;
+        }
+        .berth-cell-num { font-size: 1rem; font-weight: 800; }
+        .berth-cell-type { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+        .coach-selection-summary-bar {
+            background: #0f172a; color: #ffffff; padding: 14px 20px; border-radius: var(--radius-sm);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+
+        /* Live Status Timeline */
+        .live-status-hero {
+            background: linear-gradient(135deg, #0b2545 0%, #172554 100%);
+            color: #ffffff; border-radius: var(--radius-md); padding: 22px; margin-bottom: 20px;
+        }
+        .live-station-node {
+            position: relative; padding-left: 36px; padding-bottom: 22px;
+        }
+        .live-station-node::before {
+            content: ''; position: absolute; left: 11px; top: 12px; bottom: 0;
+            width: 3px; background: #cbd5e1;
+        }
+        .live-station-node:last-child::before { display: none; }
+        .station-bullet-dot {
+            position: absolute; left: 0; top: 3px; width: 24px; height: 24px;
+            border-radius: 50%; background: #ffffff; border: 3px solid #94a3b8;
+            display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+        }
+        .live-station-node.passed .station-bullet-dot { background: #10b981; border-color: #059669; color: #ffffff; }
+        .live-station-node.current .station-bullet-dot {
+            background: #3b82f6; border-color: #1d4ed8; color: #ffffff;
+            transform: scale(1.2); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.35);
+        }
 
         /* Modal Overlay */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(11, 26, 44, 0.65);
+            backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center;
             z-index: 1000; padding: 20px;
         }
         .modal-overlay.open { display: flex; }
         .modal-box {
-            background: #ffffff; border-radius: var(--radius-lg);
-            max-width: 820px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg);
+            background: #ffffff; border-radius: var(--radius-lg); max-width: 860px;
+            width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg);
         }
         .modal-header {
-            padding: 18px 22px; border-bottom: 1px solid var(--border);
+            padding: 20px 24px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .modal-body { padding: 22px; }
+        .modal-body { padding: 24px; }
 
-        /* Payment Selector */
-        .payment-methods-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0;
-        }
-        .payment-card {
-            border: 2px solid var(--border); border-radius: var(--radius-sm);
-            padding: 14px; text-align: center; cursor: pointer; transition: all 0.2s ease;
-        }
-        .payment-card:hover { border-color: var(--primary-light); background: #f8fafc; }
-        .payment-card.active { border-color: var(--success); background: #f0fdf4; }
-        .payment-card-icon { font-size: 24px; margin-bottom: 6px; }
-        .payment-card-title { font-size: 0.85rem; font-weight: 700; }
-
-        /* Live Tracking Timeline */
-        .track-timeline { position: relative; padding-left: 30px; margin-top: 18px; }
-        .track-timeline::before {
-            content: ''; position: absolute; left: 10px; top: 8px; bottom: 8px;
-            width: 3px; background: #cbd5e1;
-        }
-        .track-node { position: relative; margin-bottom: 22px; }
-        .track-bullet {
-            position: absolute; left: -26px; top: 4px; width: 14px; height: 14px;
-            border-radius: 50%; background: #94a3b8; border: 3px solid #ffffff;
-        }
-        .track-node.passed .track-bullet { background: #10b981; }
-        .track-node.current .track-bullet {
-            background: #3b82f6; transform: scale(1.3);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4); animation: pulse-ring 1.5s infinite;
-        }
-        .track-station-title { font-size: 1rem; font-weight: 800; color: var(--text-main); }
-        .track-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-
-        /* E-Ticket ERS */
-        .ers-ticket {
+        /* Digital ERS Ticket */
+        .ers-digital-ticket {
             background: #ffffff; border: 2px dashed #94a3b8; border-radius: var(--radius-md);
-            padding: 22px; box-shadow: var(--shadow-sm);
+            padding: 24px; box-shadow: var(--shadow-subtle);
         }
-        .ers-header {
+        .ers-ticket-top {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 16px;
+            border-bottom: 2px solid var(--primary); padding-bottom: 14px; margin-bottom: 16px;
         }
-        .ers-pnr-box {
-            background: #0f172a; color: #ffffff; padding: 8px 16px; border-radius: var(--radius-sm); text-align: right;
+        .ers-pnr-tag {
+            background: #0f172a; color: #ffffff; padding: 10px 18px; border-radius: var(--radius-sm); text-align: right;
         }
-        .ers-pnr-box strong { font-size: 1.35rem; font-family: 'JetBrains Mono', monospace; font-weight: 800; display: block; }
+        .ers-pnr-tag strong { font-size: 1.45rem; font-family: 'JetBrains Mono', monospace; font-weight: 800; display: block; }
 
         /* Toast Container */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
         .toast {
-            background: #0f172a; color: #ffffff; padding: 12px 18px; border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
-            min-width: 280px; max-width: 420px;
+            background: #0f172a; color: #ffffff; padding: 14px 20px; border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; font-size: 0.92rem;
+            min-width: 300px; max-width: 440px; animation: slideInToast 0.3s ease;
         }
         .toast.success { border-left: 5px solid var(--success); }
         .toast.error { border-left: 5px solid var(--danger); }
         .toast.warning { border-left: 5px solid var(--warning); }
+        @keyframes slideInToast { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Print Media */
+        @media print {
+            .gov-banner, header, .nav-wrapper, .tatkal-flash-strip, .search-hero-card, .btn-action-tool, .btn-book-cta { display: none !important; }
+            .modal-overlay { position: static; background: none; }
+            .modal-box { box-shadow: none; max-width: 100%; border: none; }
+            body { background: #ffffff; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Government Top Strip -->
+    <div class="gov-banner">
+        <span>🇮🇳 Government of India • Ministry of Railways • Indian Railway Catering and Tourism Corporation</span>
+        <div>
+            <span id="live-ist-clock">IST --:--:--</span>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
     <header>
         <div class="header-container">
-            <a href="#" class="brand" onclick="switchTab('search'); return false;">
-                <div class="brand-logo">🚆</div>
+            <a href="#" class="brand" onclick="switchNavTab('search'); return false;">
+                <div class="brand-emblem">🚆</div>
                 <div class="brand-text">
-                    <h1>RailStay IRCTC Portal</h1>
-                    <p>Enterprise Indian Railways Online Reservation System</p>
+                    <h1>RailStay IRCTC NextGen</h1>
+                    <p>Official Indian Railways Passenger Reservation & Tracking</p>
                 </div>
             </a>
 
-            <div class="header-right">
-                <div class="badge-live">
-                    <span class="live-dot"></span>
-                    <span id="header-db-status">PostgreSQL Connected</span>
+            <div class="header-actions">
+                <div class="pill-badge">
+                    <span class="radar-dot"></span>
+                    <span id="header-db-status">PostgreSQL 18 Live (8,990 Stations • 5,208 Trains)</span>
                 </div>
-                <div class="badge-live" style="background: rgba(0,0,0,0.3);" id="live-ist-clock">
-                    IST --:--:--
-                </div>
-                <button type="button" class="user-auth-btn" id="btn-user-profile" onclick="openUserModal()">
-                    <span id="user-display-name">👤 Login / Account</span>
+                <button type="button" class="btn-account-pill" onclick="openUserModal()">
+                    <span id="user-header-label">👤 Login / Account</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Tatkal Dynamic Countdown Alert Strip -->
-    <div class="tatkal-alert-strip" id="tatkal-alert-strip">
-        <span>⚡ <strong>TATKAL BOOKING DESK:</strong> AC Tatkal opens 10:00 AM IST • Non-AC Tatkal opens 11:00 AM IST • Verified Master List Enabled</span>
+    <!-- Tatkal Status Flash Ribbon -->
+    <div class="tatkal-flash-strip" id="tatkal-status-strip">
+        <span>⚡ <strong>TATKAL BOOKING DESK:</strong> AC Tatkal opens 10:00 AM IST • Non-AC Tatkal opens 11:00 AM IST • Verified Master Passenger List Active</span>
     </div>
 
-    <!-- Navigation -->
+    <!-- Navigation Tabs Bar -->
     <div class="nav-wrapper">
         <div class="nav-container">
-            <button class="nav-btn active" id="btn-tab-search" onclick="switchTab('search')">
+            <button class="nav-btn active" id="btn-tab-search" onclick="switchNavTab('search')">
                 <span>🔍</span> Book Train Tickets
             </button>
-            <button class="nav-btn" id="btn-tab-live" onclick="switchTab('live')">
-                <span>📍</span> Live Train Running Status (NTES)
+            <button class="nav-btn" id="btn-tab-live" onclick="switchNavTab('live')">
+                <span>📍</span> Live Running Status (Spot Your Train)
             </button>
-            <button class="nav-btn" id="btn-tab-pnr" onclick="switchTab('pnr')">
-                <span>🎫</span> PNR Inquiry
-            </button>
-            <button class="nav-btn" id="btn-tab-cancel" onclick="switchTab('cancel')">
-                <span>❌</span> Cancel Ticket & Refund
-            </button>
-            <button class="nav-btn" id="btn-tab-coach" onclick="switchTab('coach')">
+            <button class="nav-btn" id="btn-tab-coach" onclick="switchNavTab('coach')">
                 <span>🪑</span> Interactive Coach Layout
             </button>
-            <button class="nav-btn" id="btn-tab-profile" onclick="switchTab('profile')">
+            <button class="nav-btn" id="btn-tab-pnr" onclick="switchNavTab('pnr')">
+                <span>🎫</span> PNR Inquiry & Status
+            </button>
+            <button class="nav-btn" id="btn-tab-cancel" onclick="switchNavTab('cancel')">
+                <span>❌</span> Cancel Ticket & Instant Refund
+            </button>
+            <button class="nav-btn" id="btn-tab-profile" onclick="switchNavTab('profile')">
                 <span>👤</span> My Account & Master List
             </button>
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Content Work Area -->
     <main>
         <!-- TAB 1: TRAIN SEARCH & BOOKING -->
-        <section id="tab-search" class="tab-view active">
-            <div class="search-hero">
-                <div class="search-hero-title">Official Indian Railways Ticket Reservation</div>
-                <div class="search-hero-subtitle">8,990 Stations • 5,208 Trains • General, Tatkal, Ladies & Senior Citizen Quota</div>
+        <section id="view-tab-search" class="workspace-view active">
+            <!-- Hero Search Card with Dual Search Modes -->
+            <div class="search-hero-card">
+                <div class="search-hero-top">
+                    <div class="search-title">
+                        <h2>Indian Railway Reservation Portal</h2>
+                        <p>Search over 5,208 Trains, 8,990 Stations & 417,080 Intermediate Halts</p>
+                    </div>
 
-                <div class="search-bar-grid">
-                    <div class="search-input-group">
+                    <!-- Dual Mode Switcher -->
+                    <div class="search-mode-switcher">
+                        <button type="button" class="mode-tab active" id="tab-mode-route" onclick="setSearchMode('route')">
+                            🔀 Search by Route
+                        </button>
+                        <button type="button" class="mode-tab" id="tab-mode-train" onclick="setSearchMode('train')">
+                            🔢 Search by Train No / Name
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mode A: Search by Route Form -->
+                <div class="route-search-grid" id="form-search-route">
+                    <div class="input-floating-group">
                         <label>From Station</label>
-                        <input type="text" id="search-from-input" placeholder="Station Code/Name" autocomplete="off" oninput="onStationInput('from')" value="NEW DELHI (NDLS)">
-                        <input type="hidden" id="search-from-code" value="NDLS">
-                        <div id="from-autocomplete" class="autocomplete-list"></div>
+                        <input type="text" id="route-from-input" placeholder="Station Code or City (e.g. NDLS)" autocomplete="off" oninput="handleStationInput('from')" value="NEW DELHI (NDLS)">
+                        <input type="hidden" id="route-from-code" value="NDLS">
+                        <div id="from-station-dropdown" class="autocomplete-dropdown"></div>
                     </div>
 
-                    <button type="button" class="btn-swap" onclick="swapStations()" title="Swap stations">⇄</button>
+                    <button type="button" class="btn-swap-stations" onclick="swapSearchStations()" title="Swap Stations">⇄</button>
 
-                    <div class="search-input-group">
+                    <div class="input-floating-group">
                         <label>To Station</label>
-                        <input type="text" id="search-to-input" placeholder="Station Code/Name" autocomplete="off" oninput="onStationInput('to')" value="BHOPAL JN (BPL)">
-                        <input type="hidden" id="search-to-code" value="BPL">
-                        <div id="to-autocomplete" class="autocomplete-list"></div>
+                        <input type="text" id="route-to-input" placeholder="Station Code or City (e.g. BPL)" autocomplete="off" oninput="handleStationInput('to')" value="BHOPAL JN (BPL)">
+                        <input type="hidden" id="route-to-code" value="BPL">
+                        <div id="to-station-dropdown" class="autocomplete-dropdown"></div>
                     </div>
 
-                    <div class="search-input-group">
+                    <div class="input-floating-group">
                         <label>Date of Journey</label>
-                        <input type="date" id="search-date-input">
+                        <input type="date" id="route-date-input">
                     </div>
 
-                    <div class="search-input-group">
+                    <div class="input-floating-group">
                         <label>Quota</label>
-                        <select id="search-quota-select" onchange="searchTrains()">
+                        <select id="route-quota-select" onchange="executeSearch()">
                             <option value="GENERAL">General Quota (GN)</option>
                             <option value="TATKAL">Tatkal Quota (TQ)</option>
                             <option value="LADIES">Ladies Quota (LD)</option>
@@ -432,131 +522,157 @@
                         </select>
                     </div>
 
-                    <button type="button" class="btn-search" onclick="searchTrains()">
+                    <button type="button" class="btn-primary-action" onclick="executeSearch()">
                         <span>🔍</span> Find Trains
+                    </button>
+                </div>
+
+                <!-- Mode B: Search by Train Number / Name Form -->
+                <div class="train-search-grid" id="form-search-train">
+                    <div class="input-floating-group">
+                        <label>Train Number or Name</label>
+                        <input type="text" id="direct-train-input" placeholder="Enter Train Number (e.g. 12002, 12951) or Name (Shatabdi, Rajdhani, Vande Bharat)" autocomplete="off" oninput="handleTrainInput()" value="12002">
+                        <div id="train-lookup-dropdown" class="autocomplete-dropdown"></div>
+                    </div>
+
+                    <div class="input-floating-group">
+                        <label>Date of Journey</label>
+                        <input type="date" id="direct-train-date">
+                    </div>
+
+                    <div class="input-floating-group">
+                        <label>Quota</label>
+                        <select id="direct-train-quota">
+                            <option value="GENERAL">General Quota (GN)</option>
+                            <option value="TATKAL">Tatkal Quota (TQ)</option>
+                            <option value="LADIES">Ladies Quota (LD)</option>
+                            <option value="SENIOR_CITIZEN">Senior Citizen</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn-primary-action" onclick="executeSearch()">
+                        <span>🔍</span> Search Train
                     </button>
                 </div>
             </div>
 
-            <!-- Trains Results -->
-            <div id="search-results-container"></div>
+            <!-- Trains Search Results Container -->
+            <div id="trains-results-container"></div>
         </section>
 
         <!-- TAB 2: LIVE TRAIN STATUS (SPOT YOUR TRAIN / NTES) -->
-        <section id="tab-live" class="tab-view" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h2><span>📍</span> Live Train Running Status (NTES Spot Your Train)</h2>
-                        <p>Real-time station-by-station position tracking, delay status, platform numbers, and distance covered.</p>
-                    </div>
+        <section id="view-tab-live" class="workspace-view" style="display: none;">
+            <div style="background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-subtle);">
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary);">📍 Live Train Running Status (NTES Spot Your Train)</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">Accurate station-by-station position tracking, real delay status, platform numbers, and distance covered.</p>
                 </div>
 
-                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
-                    <input type="text" id="live-train-input" class="form-control" placeholder="Enter Train Number (e.g. 12002, 12138, 12951)" style="font-weight: 700; font-size: 1.05rem;" value="12002">
-                    <button type="button" class="btn-search" onclick="fetchLiveTrainStatus()">
+                <div style="display: flex; gap: 14px; max-width: 720px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 260px; position: relative;">
+                        <input type="text" id="ntes-train-query" class="input-floating-group" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; font-weight: 700;" placeholder="Train No or Name (e.g. 12002, 12951, Vande Bharat)" value="12002" autocomplete="off" oninput="handleNtesTrainInput()">
+                        <div id="ntes-train-dropdown" class="autocomplete-dropdown"></div>
+                    </div>
+                    <select id="ntes-day-offset" style="flex: 1; min-width: 180px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.92rem; font-weight: 600;">
+                        <option value="today">Departed Today</option>
+                        <option value="yesterday">Departed Yesterday</option>
+                        <option value="tomorrow">Departing Tomorrow</option>
+                    </select>
+                    <button type="button" class="btn-primary-action" onclick="fetchLiveStatus()">
                         Track Train
                     </button>
                 </div>
 
-                <div id="live-status-view"></div>
+                <div id="ntes-live-result-display"></div>
             </div>
         </section>
 
-        <!-- TAB 3: PNR STATUS INQUIRY -->
-        <section id="tab-pnr" class="tab-view" style="display: none;">
-            <div class="card">
-                <div class="card-header">
+        <!-- TAB 3: AUTHENTIC INTERACTIVE COACH LAYOUT -->
+        <section id="view-tab-coach" class="workspace-view" style="display: none;">
+            <div style="background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px; flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <h2><span>🎫</span> PNR Inquiry & Current Status</h2>
-                        <p>Check live berth allocation, RAC position, and waitlist auto-promotion status.</p>
+                        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary);">🪑 Interactive Coach Layout & Berth Map</h2>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">Authentic Indian Railways coach bay architecture. Click any available berth to select your exact seat.</p>
                     </div>
-                </div>
-
-                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
-                    <input type="text" id="pnr-input" class="form-control" placeholder="Enter 10-Digit PNR Number" maxlength="10" style="font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 1.1rem;">
-                    <button type="button" class="btn-search" onclick="checkPnrStatus()">
-                        Check Status
-                    </button>
-                </div>
-
-                <div id="pnr-result-view"></div>
-            </div>
-        </section>
-
-        <!-- TAB 4: CANCEL TICKET & REFUND -->
-        <section id="tab-cancel" class="tab-view" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h2><span>❌</span> Ticket Cancellation & Instant Refund Engine</h2>
-                        <p>Cancel confirmed tickets. Vacated berths are automatically promoted to RAC/WL passengers in FIFO order.</p>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
-                    <input type="text" id="cancel-pnr-input" class="form-control" placeholder="Enter 10-Digit PNR to cancel" maxlength="10" style="font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 1.1rem;">
-                    <button type="button" class="btn-search" style="background: var(--danger);" onclick="previewCancelTicket()">
-                        Find Ticket
-                    </button>
-                </div>
-
-                <div id="cancel-preview-view"></div>
-            </div>
-        </section>
-
-        <!-- TAB 5: COACH LAYOUT -->
-        <section id="tab-coach" class="tab-view" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h2><span>🪑</span> Interactive Coach Layout & Berth Map</h2>
-                        <p>View real-time layout of coach berths (Lower, Middle, Upper, Side Lower, Side Upper) and occupancy.</p>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="coach-train-input" class="form-control" placeholder="Train No (e.g. 12002)" style="width: 150px;" value="12002">
-                        <select id="coach-class-select" class="form-control" style="width: 150px;" onchange="loadCoachSeatMap()">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="coach-filter-train" style="width: 140px; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-weight: 700;" value="12002" placeholder="Train No">
+                        <select id="coach-filter-class" style="width: 150px; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-weight: 600;" onchange="loadInteractiveCoachMap()">
                             <option value="3A">AC 3-Tier (3A)</option>
                             <option value="2A">AC 2-Tier (2A)</option>
                             <option value="1A">AC 1st Class (1A)</option>
                             <option value="SL">Sleeper (SL)</option>
                             <option value="CC">Chair Car (CC)</option>
                         </select>
-                        <button type="button" class="btn-search" onclick="loadCoachSeatMap()">View Layout</button>
+                        <button type="button" class="btn-primary-action" style="height: 40px; padding: 0 18px;" onclick="loadInteractiveCoachMap()">Load Coach</button>
                     </div>
                 </div>
 
-                <div id="coach-layout-view"></div>
+                <div id="coach-interactive-workspace"></div>
+            </div>
+        </section>
+
+        <!-- TAB 4: PNR INQUIRY -->
+        <section id="view-tab-pnr" class="workspace-view" style="display: none;">
+            <div style="background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-subtle);">
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary);">🎫 Official PNR Inquiry & Status</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">Check real-time booking status, coach/seat allocation, and waitlist auto-promotion.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
+                    <input type="text" id="pnr-search-input" style="flex: 1; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1.15rem; font-family: 'JetBrains Mono', monospace; font-weight: 800;" placeholder="Enter 10-Digit PNR Number" maxlength="10">
+                    <button type="button" class="btn-primary-action" onclick="executePnrLookup()">Check PNR</button>
+                </div>
+
+                <div id="pnr-status-display"></div>
+            </div>
+        </section>
+
+        <!-- TAB 5: CANCEL TICKET & REFUND -->
+        <section id="view-tab-cancel" class="workspace-view" style="display: none;">
+            <div style="background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-subtle);">
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary);">❌ Ticket Cancellation & Instant Refund</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">Cancel tickets with official IRCTC refund deduction rules. Vacated berths are automatically promoted to RAC/WL passengers in FIFO order.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
+                    <input type="text" id="cancel-pnr-input" style="flex: 1; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1.15rem; font-family: 'JetBrains Mono', monospace; font-weight: 800;" placeholder="Enter 10-Digit PNR to Cancel" maxlength="10">
+                    <button type="button" class="btn-primary-action" style="background: var(--danger);" onclick="previewTicketCancellation()">Find Ticket</button>
+                </div>
+
+                <div id="cancel-ticket-preview"></div>
             </div>
         </section>
 
         <!-- TAB 6: MY ACCOUNT & MASTER PASSENGER LIST -->
-        <section id="tab-profile" class="tab-view" style="display: none;">
-            <div class="card">
-                <div class="card-header">
+        <section id="view-tab-profile" class="workspace-view" style="display: none;">
+            <div style="background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
                     <div>
-                        <h2><span>👤</span> User Account & Master Passenger List</h2>
-                        <p>Manage verified master passenger list for 1-click booking autofill and inspect past journey history.</p>
+                        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary);">👤 My Account & Master Passenger List</h2>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">Manage verified family members for 1-click booking and review booked trips.</p>
                     </div>
-                    <button type="button" class="btn-coach-map" onclick="logoutUser()">🚪 Sign Out</button>
+                    <button type="button" class="btn-action-tool" onclick="logoutSession()">🚪 Sign Out</button>
                 </div>
 
-                <!-- User Profile Card -->
-                <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <!-- Account Badge -->
+                <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
                     <div>
-                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary-dark);" id="profile-full-name">Divyanshu Sharma</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">IRCTC Username: <strong id="profile-username">demo_user</strong> • Email: <span id="profile-email">divyanshu@example.com</span></div>
+                        <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary);" id="account-full-name">Divyanshu Sharma</div>
+                        <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">IRCTC Username: <strong id="account-username">demo_user</strong> • Email: <span id="account-email">divyanshu@example.com</span></div>
                     </div>
-                    <span class="avail-badge avail-green">KYC VERIFIED</span>
+                    <span class="status-badge badge-available" style="font-size: 0.85rem;">KYC VERIFIED</span>
                 </div>
 
-                <!-- Master Passenger List Section -->
+                <!-- Master Passenger List -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                    <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary-dark);">📋 Saved Master Passengers (Family & Friends)</h3>
-                    <button type="button" class="btn-coach-map" onclick="openAddMasterModal()">+ Add New Co-Passenger</button>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary);">📋 Saved Master Passengers (Family & Friends)</h3>
+                    <button type="button" class="btn-action-tool" onclick="openAddMasterPassengerModal()">+ Add New Co-Passenger</button>
                 </div>
 
-                <div class="table-responsive" style="margin-bottom: 30px;">
+                <div style="overflow-x: auto; margin-bottom: 30px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: #f1f5f9; text-align: left; font-size: 0.82rem; text-transform: uppercase;">
@@ -568,78 +684,78 @@
                                 <th style="padding: 10px; text-align: right;">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="master-passengers-tbody"></tbody>
+                        <tbody id="master-list-tbody"></tbody>
                     </table>
                 </div>
 
-                <!-- User Bookings History -->
-                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 14px;">🎫 My Booked Journeys</h3>
-                <div id="user-bookings-container"></div>
+                <!-- User Booked Trips -->
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 14px;">🎫 My Booked Journeys</h3>
+                <div id="user-trips-container"></div>
             </div>
         </section>
     </main>
 
     <!-- BOOKING & CHECKOUT MODAL -->
-    <div id="booking-modal" class="modal-overlay">
+    <div id="modal-checkout" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
                 <div>
-                    <h3 id="book-modal-title" style="font-size: 1.2rem; font-weight: 800; color: var(--primary-dark);">Passenger Reservation & Payment</h3>
-                    <p id="book-modal-sub" style="font-size: 0.82rem; color: var(--text-muted);">Express Train • General Quota</p>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary);" id="checkout-train-heading">Book Train Seats</h3>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);" id="checkout-train-sub">Express Train</p>
                 </div>
-                <button type="button" class="btn-remove" style="font-size: 1.4rem; background: none; border: none; cursor: pointer;" onclick="closeBookingModal()">✕</button>
+                <button type="button" class="btn-action-tool" onclick="closeCheckoutModal()">✕</button>
             </div>
             <div class="modal-body">
-                <!-- 1-Click Master List Autofill Pills -->
-                <div style="margin-bottom: 14px;">
-                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">1-CLICK ADD FROM MASTER LIST:</div>
-                    <div class="master-pills-container" id="booking-master-pills"></div>
+                <!-- 1-Click Master List Add Ribbon -->
+                <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px;">
+                    <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">1-CLICK ADD FROM MASTER PASSENGER LIST:</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="checkout-master-pills"></div>
                 </div>
 
-                <form id="booking-form" onsubmit="proceedToCheckout(event)">
+                <form id="checkout-form" onsubmit="executeCheckout(event)">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <span style="font-weight: 700; color: #475569;">Passenger List</span>
-                        <button type="button" class="btn-coach-map" onclick="addPassengerRow()">+ Add Co-Passenger</button>
+                        <span style="font-weight: 800; color: var(--primary);">Passenger List</span>
+                        <button type="button" class="btn-action-tool" onclick="addPassengerFormField()">+ Add Passenger</button>
                     </div>
 
-                    <div id="passengers-container"></div>
+                    <div id="passengers-form-container"></div>
 
-                    <!-- Add-ons -->
-                    <div style="background: #f8fafc; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin: 14px 0;">
+                    <!-- Travel Insurance Checkbox -->
+                    <div style="background: #f8fafc; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin: 16px 0;">
                         <label style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; font-weight: 600; cursor: pointer;">
-                            <input type="checkbox" id="travel-insurance-chk" checked onchange="recalcTotalFare()">
+                            <input type="checkbox" id="checkout-insurance-chk" checked onchange="recalculateCheckoutFare()">
                             <span>🛡️ Travel Insurance (₹0.35 per passenger) — Accidental cover up to ₹10 Lakh</span>
                         </label>
                     </div>
 
-                    <!-- Payment Method Selector -->
-                    <div style="font-size: 0.85rem; font-weight: 700; color: #475569; margin-top: 16px;">SELECT PAYMENT GATEWAY:</div>
-                    <div class="payment-methods-grid">
-                        <div class="payment-card active" onclick="selectPaymentMethod('UPI', this)">
-                            <div class="payment-card-icon">📱</div>
-                            <div class="payment-card-title">UPI / QR Code</div>
+                    <!-- Payment Gateway Selector -->
+                    <div style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-top: 14px;">SELECT PAYMENT METHOD:</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 12px 0;">
+                        <div class="class-tier-tile active" id="pay-upi" onclick="choosePayment('UPI', this)">
+                            <div style="font-size: 24px; text-align: center;">📱</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.88rem; margin-top: 4px;">UPI / QR Code</div>
                         </div>
-                        <div class="payment-card" onclick="selectPaymentMethod('Card', this)">
-                            <div class="payment-card-icon">💳</div>
-                            <div class="payment-card-title">Credit / Debit Card</div>
+                        <div class="class-tier-tile" id="pay-card" onclick="choosePayment('Card', this)">
+                            <div style="font-size: 24px; text-align: center;">💳</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.88rem; margin-top: 4px;">Credit / Debit Card</div>
                         </div>
-                        <div class="payment-card" onclick="selectPaymentMethod('NetBanking', this)">
-                            <div class="payment-card-icon">🏦</div>
-                            <div class="payment-card-title">Net Banking</div>
+                        <div class="class-tier-tile" id="pay-net" onclick="choosePayment('NetBanking', this)">
+                            <div style="font-size: 24px; text-align: center;">🏦</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.88rem; margin-top: 4px;">Net Banking</div>
                         </div>
-                        <div class="payment-card" onclick="selectPaymentMethod('Wallet', this)">
-                            <div class="payment-card-icon">👛</div>
-                            <div class="payment-card-title">IRCTC e-Wallet</div>
+                        <div class="class-tier-tile" id="pay-wallet" onclick="choosePayment('Wallet', this)">
+                            <div style="font-size: 24px; text-align: center;">👛</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.88rem; margin-top: 4px;">IRCTC e-Wallet</div>
                         </div>
                     </div>
 
-                    <!-- Total Fare & Pay Button -->
+                    <!-- Total Payable & Pay Button -->
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;">
                         <div>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">TOTAL PAYABLE AMOUNT</span>
-                            <div style="font-size: 1.6rem; font-weight: 800; color: #047857;" id="modal-total-fare">₹0.00</div>
+                            <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700;">TOTAL PAYABLE AMOUNT</span>
+                            <div style="font-size: 1.65rem; font-weight: 800; color: var(--success);" id="checkout-total-fare">₹0.00</div>
                         </div>
-                        <button type="submit" class="btn-search" id="btn-confirm-pay" style="background: var(--success); font-size: 1.05rem;">
+                        <button type="submit" class="btn-primary-action" id="btn-submit-pay" style="background: var(--success); font-size: 1.05rem;">
                             🔒 Pay & Book Ticket
                         </button>
                     </div>
@@ -649,49 +765,63 @@
     </div>
 
     <!-- DIGITAL BOARDING PASS E-TICKET MODAL -->
-    <div id="ticket-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 820px;">
+    <div id="modal-digital-ticket" class="modal-overlay">
+        <div class="modal-box" style="max-width: 840px;">
             <div class="modal-header">
-                <h3 style="font-weight: 800; color: var(--primary-dark);">Electronic Reservation Slip (ERS)</h3>
+                <h3 style="font-weight: 800; color: var(--primary);">Electronic Reservation Slip (ERS)</h3>
                 <div style="display: flex; gap: 8px;">
-                    <button type="button" class="btn-coach-map" onclick="window.print()">🖨️ Print E-Ticket</button>
-                    <button type="button" class="btn-coach-map" onclick="closeTicketModal()">✕</button>
+                    <button type="button" class="btn-action-tool" onclick="window.print()">🖨️ Print Ticket</button>
+                    <button type="button" class="btn-action-tool" onclick="closeDigitalTicketModal()">✕</button>
                 </div>
             </div>
-            <div class="modal-body" id="ticket-modal-body"></div>
+            <div class="modal-body" id="digital-ticket-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- TIMETABLE SCHEDULE MODAL -->
+    <div id="modal-timetable" class="modal-overlay">
+        <div class="modal-box" style="max-width: 860px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="timetable-modal-title" style="font-weight: 800; color: var(--primary);">Route Timetable Schedule</h3>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">Intermediate Halts & Platform Numbers</p>
+                </div>
+                <button type="button" class="btn-action-tool" onclick="closeTimetableModal()">✕</button>
+            </div>
+            <div class="modal-body" id="timetable-modal-body"></div>
         </div>
     </div>
 
     <!-- ADD MASTER PASSENGER MODAL -->
-    <div id="add-master-modal" class="modal-overlay">
+    <div id="modal-add-master" class="modal-overlay">
         <div class="modal-box" style="max-width: 520px;">
             <div class="modal-header">
-                <h3 style="font-weight: 800; color: var(--primary-dark);">Add Co-Passenger to Master List</h3>
-                <button type="button" class="btn-coach-map" onclick="closeAddMasterModal()">✕</button>
+                <h3 style="font-weight: 800; color: var(--primary);">Add Co-Passenger to Master List</h3>
+                <button type="button" class="btn-action-tool" onclick="closeAddMasterModal()">✕</button>
             </div>
             <div class="modal-body">
-                <form onsubmit="saveMasterPassenger(event)">
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label>Full Name</label>
-                        <input type="text" class="form-control" id="m-name" placeholder="As on official ID" required>
+                <form onsubmit="saveMasterCoPassenger(event)">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">Full Name</label>
+                        <input type="text" id="m-add-name" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;" placeholder="As on official ID" required>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>Age</label>
-                            <input type="number" class="form-control" id="m-age" min="1" max="110" value="28" required>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">Age</label>
+                            <input type="number" id="m-add-age" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;" min="1" max="110" value="28" required>
                         </div>
-                        <div class="form-group">
-                            <label>Gender</label>
-                            <select class="form-control" id="m-gender">
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">Gender</label>
+                            <select id="m-add-gender" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label>Berth Preference</label>
-                        <select class="form-control" id="m-berth">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">Berth Preference</label>
+                        <select id="m-add-berth" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
                             <option value="Lower">Lower Berth</option>
                             <option value="Middle">Middle Berth</option>
                             <option value="Upper">Upper Berth</option>
@@ -701,88 +831,76 @@
                         </select>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label>ID Card Type</label>
-                            <select class="form-control" id="m-idtype">
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">ID Card Type</label>
+                            <select id="m-add-idtype" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
                                 <option value="Aadhaar Card">Aadhaar Card</option>
                                 <option value="Voter ID">Voter ID</option>
                                 <option value="Passport">Passport</option>
                                 <option value="Driving License">Driving License</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>ID Card Number</label>
-                            <input type="text" class="form-control" id="m-idnum" placeholder="XXXX-XXXX-XXXX">
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">ID Number</label>
+                            <input type="text" id="m-add-idnum" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;" placeholder="XXXX-XXXX-XXXX">
                         </div>
                     </div>
-                    <button type="submit" class="btn-search" style="width: 100%; justify-content: center;">
-                        💾 Save Co-Passenger
+                    <button type="submit" class="btn-primary-action" style="width: 100%; justify-content: center;">
+                        💾 Save to Master List
                     </button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- ROUTE SCHEDULE TIMETABLE MODAL -->
-    <div id="schedule-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 860px;">
-            <div class="modal-header">
-                <div>
-                    <h3 id="schedule-modal-title" style="font-weight: 800; color: var(--primary-dark);">Route Timetable Schedule</h3>
-                    <p id="schedule-modal-sub" style="font-size: 0.82rem; color: var(--text-muted);">Intermediate Halts & Timings</p>
-                </div>
-                <button type="button" class="btn-coach-map" onclick="closeScheduleModal()">✕</button>
-            </div>
-            <div class="modal-body" id="schedule-modal-body"></div>
-        </div>
-    </div>
-
-    <!-- USER AUTH MODAL -->
-    <div id="user-auth-modal" class="modal-overlay">
+    <!-- USER SIGN IN MODAL -->
+    <div id="modal-auth-login" class="modal-overlay">
         <div class="modal-box" style="max-width: 440px;">
             <div class="modal-header">
-                <h3 style="font-weight: 800; color: var(--primary-dark);" id="auth-modal-title">Sign In to IRCTC Portal</h3>
-                <button type="button" class="btn-coach-map" onclick="closeUserModal()">✕</button>
+                <h3 style="font-weight: 800; color: var(--primary);">Sign In to IRCTC Portal</h3>
+                <button type="button" class="btn-action-tool" onclick="closeAuthModal()">✕</button>
             </div>
             <div class="modal-body">
-                <form id="login-form" onsubmit="handleLogin(event)">
-                    <div class="form-group" style="margin-bottom: 14px;">
-                        <label>Username</label>
-                        <input type="text" class="form-control" id="login-username" value="demo_user" required>
+                <form onsubmit="handleUserSignIn(event)">
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">Username</label>
+                        <input type="text" id="auth-username-in" style="width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 6px;" value="demo_user" required>
                     </div>
-                    <div class="form-group" style="margin-bottom: 18px;">
-                        <label>Password</label>
-                        <input type="password" class="form-control" id="login-password" value="password123" required>
+                    <div style="margin-bottom: 18px;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">Password</label>
+                        <input type="password" id="auth-password-in" style="width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 6px;" value="password123" required>
                     </div>
-                    <button type="submit" class="btn-search" style="width: 100%; justify-content: center; margin-bottom: 12px;">
+                    <button type="submit" class="btn-primary-action" style="width: 100%; justify-content: center; margin-bottom: 12px;">
                         Sign In ➔
                     </button>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">Demo credentials pre-filled: <strong>demo_user</strong> / <strong>password123</strong></p>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); text-align: center;">Demo Account: <strong>demo_user</strong> / <strong>password123</strong></p>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notifications Container -->
+    <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <script>
         // State
         let currentUser = { userId: 1, username: 'demo_user', fullName: 'Divyanshu Sharma', email: 'divyanshu@example.com' };
-        let masterPassengers = [];
-        let currentSearchTrains = [];
+        let currentSearchMode = 'route'; // 'route' or 'train'
+        let currentSearchResults = [];
         let selectedTrain = null;
         let selectedClass = null;
-        let selectedPayment = 'UPI';
-        let passengerIndex = 0;
+        let selectedPaymentMethod = 'UPI';
+        let masterPassengers = [];
+        let selectedCoachSeats = []; // e.g. [{ seatNumber: 14, berthType: 'MB', coach: 'B1' }]
+        let passengerFormCount = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             initClock();
-            setDefaultDate();
-            checkTatkalDeskStatus();
+            initDefaultDate();
             loadMasterPassengers();
-            searchTrains();
-            updateUserHeader();
+            checkTatkalAvailability();
+            updateUserNavHeader();
+            executeSearch(); // Load initial trains
         });
 
         function initClock() {
@@ -793,42 +911,56 @@
             }, 1000);
         }
 
-        function setDefaultDate() {
+        function initDefaultDate() {
             const tmrw = new Date();
             tmrw.setDate(tmrw.getDate() + 1);
-            document.getElementById('search-date-input').value = tmrw.toISOString().split('T')[0];
+            const dateStr = tmrw.toISOString().split('T')[0];
+            document.getElementById('route-date-input').value = dateStr;
+            document.getElementById('direct-train-date').value = dateStr;
         }
 
-        async function checkTatkalDeskStatus() {
+        async function checkTatkalAvailability() {
             try {
                 const res = await fetch('/api/tatkal/status');
                 const data = await res.json();
-                const strip = document.getElementById('tatkal-alert-strip');
+                const strip = document.getElementById('tatkal-status-strip');
                 if (data.acTatkalOpen && data.nonAcTatkalOpen) {
                     strip.style.background = '#ecfdf5';
                     strip.style.color = '#065f46';
-                    strip.innerHTML = `<span>🟢 <strong>TATKAL BOOKING ACTIVE:</strong> Both AC and Non-AC Tatkal quotas are currently open! Instant allocation enabled.</span>`;
-                } else if (data.acTatkalOpen) {
-                    strip.innerHTML = `<span>🟡 <strong>TATKAL STATUS:</strong> AC Tatkal is OPEN. Non-AC Tatkal opens at 11:00 AM IST.</span>`;
+                    strip.innerHTML = `<span>🟢 <strong>TATKAL BOOKING LIVE:</strong> Both AC and Non-AC Tatkal quotas are currently open! Instant allocation active.</span>`;
                 }
             } catch (ignored) {}
         }
 
-        function switchTab(tabId) {
+        function switchNavTab(tabId) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-view').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.workspace-view').forEach(v => v.style.display = 'none');
 
             const btn = document.getElementById('btn-tab-' + tabId);
-            const view = document.getElementById('tab-' + tabId);
+            const view = document.getElementById('view-tab-' + tabId);
             if (btn) btn.classList.add('active');
             if (view) view.style.display = 'block';
 
-            if (tabId === 'profile') loadUserProfileSection();
-            if (tabId === 'live') fetchLiveTrainStatus();
-            if (tabId === 'coach') loadCoachSeatMap();
+            if (tabId === 'live') fetchLiveStatus();
+            if (tabId === 'coach') loadInteractiveCoachMap();
+            if (tabId === 'profile') loadUserProfileView();
         }
 
-        function showToast(msg, type = 'success') {
+        function setSearchMode(mode) {
+            currentSearchMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+            if (mode === 'route') {
+                document.getElementById('tab-mode-route').classList.add('active');
+                document.getElementById('form-search-route').style.display = 'grid';
+                document.getElementById('form-search-train').style.display = 'none';
+            } else {
+                document.getElementById('tab-mode-train').classList.add('active');
+                document.getElementById('form-search-route').style.display = 'none';
+                document.getElementById('form-search-train').style.display = 'grid';
+            }
+        }
+
+        function showNotification(msg, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -843,12 +975,12 @@
             }, 3500);
         }
 
-        // Station Autocomplete
-        let debounceTimer;
-        function onStationInput(field) {
-            clearTimeout(debounceTimer);
-            const input = document.getElementById(`search-${field}-input`);
-            const dropdown = document.getElementById(`${field}-autocomplete`);
+        // Station Autocomplete for Route Search
+        let stationDebounce;
+        function handleStationInput(field) {
+            clearTimeout(stationDebounce);
+            const input = document.getElementById(`route-${field}-input`);
+            const dropdown = document.getElementById(`${field}-station-dropdown`);
             const val = input.value.trim();
 
             if (val.length < 2) {
@@ -856,7 +988,7 @@
                 return;
             }
 
-            debounceTimer = setTimeout(async () => {
+            stationDebounce = setTimeout(async () => {
                 try {
                     const res = await fetch(`/api/stations/search?q=${encodeURIComponent(val)}&limit=10`);
                     const list = await res.json();
@@ -866,65 +998,114 @@
                     }
 
                     dropdown.innerHTML = list.map(s => `
-                        <div class="autocomplete-item" onclick="selectStation('${field}', '${s.stationCode}', '${s.stationName}')">
+                        <div class="autocomplete-option" onclick="pickStation('${field}', '${s.stationCode}', '${s.stationName}')">
                             <div>
                                 <strong>${s.stationName}</strong>
                                 <span style="font-size: 0.75rem; color: #64748b; margin-left: 6px;">${s.state || ''}</span>
                             </div>
-                            <span class="code-badge">${s.stationCode}</span>
+                            <span class="station-code-chip">${s.stationCode}</span>
                         </div>
                     `).join('');
                     dropdown.style.display = 'block';
-                } catch (err) {
-                    console.error(err);
-                }
+                } catch (ignored) {}
             }, 200);
         }
 
-        function selectStation(field, code, name) {
-            document.getElementById(`search-${field}-input`).value = `${name} (${code})`;
-            document.getElementById(`search-${field}-code`).value = code;
-            document.getElementById(`${field}-autocomplete`).style.display = 'none';
+        function pickStation(field, code, name) {
+            document.getElementById(`route-${field}-input`).value = `${name} (${code})`;
+            document.getElementById(`route-${field}-code`).value = code;
+            document.getElementById(`${field}-station-dropdown`).style.display = 'none';
         }
 
-        function swapStations() {
-            const fIn = document.getElementById('search-from-input');
-            const fCode = document.getElementById('search-from-code');
-            const tIn = document.getElementById('search-to-input');
-            const tCode = document.getElementById('search-to-code');
+        function swapSearchStations() {
+            const fIn = document.getElementById('route-from-input');
+            const fCode = document.getElementById('route-from-code');
+            const tIn = document.getElementById('route-to-input');
+            const tCode = document.getElementById('route-to-code');
 
-            const tempIn = fIn.value;
-            const tempCode = fCode.value;
+            const tmpIn = fIn.value;
+            const tmpCode = fCode.value;
             fIn.value = tIn.value;
             fCode.value = tCode.value;
-            tIn.value = tempIn;
-            tCode.value = tempCode;
+            tIn.value = tmpIn;
+            tCode.value = tmpCode;
 
-            searchTrains();
+            executeSearch();
         }
 
-        // Train Search
-        async function searchTrains() {
-            const from = document.getElementById('search-from-code').value.trim();
-            const to = document.getElementById('search-to-code').value.trim();
-            const date = document.getElementById('search-date-input').value;
-            const quota = document.getElementById('search-quota-select').value;
-            const container = document.getElementById('search-results-container');
+        // Train Lookup Dropdown (Mode B)
+        let trainDebounce;
+        function handleTrainInput() {
+            clearTimeout(trainDebounce);
+            const input = document.getElementById('direct-train-input');
+            const dropdown = document.getElementById('train-lookup-dropdown');
+            const val = input.value.trim();
 
+            if (val.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            trainDebounce = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/trains/lookup?q=${encodeURIComponent(val)}`);
+                    const list = await res.json();
+                    if (!list || list.length === 0) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    dropdown.innerHTML = list.map(t => `
+                        <div class="autocomplete-option" onclick="pickDirectTrain('${t.trainNumber}', '${t.trainName}')">
+                            <div>
+                                <strong>${t.trainNumber} - ${t.trainName}</strong>
+                                <div style="font-size: 0.75rem; color: #64748b;">${t.fromStationName} ➔ ${t.toStationName}</div>
+                            </div>
+                            <span class="station-code-chip">${t.trainType || 'EXP'}</span>
+                        </div>
+                    `).join('');
+                    dropdown.style.display = 'block';
+                } catch (ignored) {}
+            }, 200);
+        }
+
+        function pickDirectTrain(num, name) {
+            document.getElementById('direct-train-input').value = `${num} - ${name}`;
+            document.getElementById('train-lookup-dropdown').style.display = 'none';
+            executeSearch();
+        }
+
+        // Execute Train Search
+        async function executeSearch() {
+            const container = document.getElementById('trains-results-container');
             container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                <p style="font-size: 1.05rem; font-weight: 700;">🔄 Searching Indian Railways schedules and live seat quotas...</p>
+                <p style="font-size: 1.1rem; font-weight: 700;">🔄 Searching live inventory across Indian Railways database...</p>
             </div>`;
 
+            let url = '';
+            if (currentSearchMode === 'route') {
+                const from = document.getElementById('route-from-code').value.trim();
+                const to = document.getElementById('route-to-code').value.trim();
+                const date = document.getElementById('route-date-input').value;
+                const quota = document.getElementById('route-quota-select').value;
+                url = `/api/trains/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}&quota=${encodeURIComponent(quota)}`;
+            } else {
+                const q = document.getElementById('direct-train-input').value.trim();
+                const date = document.getElementById('direct-train-date').value;
+                const quota = document.getElementById('direct-train-quota').value;
+                url = `/api/trains/search?query=${encodeURIComponent(q)}&date=${encodeURIComponent(date)}&quota=${encodeURIComponent(quota)}`;
+            }
+
             try {
-                const res = await fetch(`/api/trains/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}&quota=${encodeURIComponent(quota)}`);
+                const res = await fetch(url);
                 const trains = await res.json();
-                currentSearchTrains = trains;
+                currentSearchResults = trains;
 
                 if (!trains || trains.length === 0) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 40px; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border);">
-                            <p style="font-size: 1.2rem; font-weight: 800; color: var(--danger);">No Direct or Intermediate Trains Found</p>
-                            <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 6px;">Try major hub pairs like NDLS to BPL, MMCT, or HWH.</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--danger);">No Direct or Intermediate Trains Found</p>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">Try major hub pairs like NDLS to BPL, MMCT, or HWH, or search directly by train number (e.g. 12002).</p>
                         </div>
                     `;
                     return;
@@ -934,16 +1115,16 @@
                     const classesHtml = t.availableClasses.map(c => {
                         const isAvail = c.statusCode === 'AVAILABLE';
                         const isRac = c.statusCode === 'RAC';
-                        const badgeClass = isAvail ? 'avail-green' : isRac ? 'avail-amber' : 'avail-red';
+                        const badgeClass = isAvail ? 'badge-available' : isRac ? 'badge-rac' : 'badge-waitlist';
 
                         return `
-                            <div class="class-tile" onclick="selectClassForTrain('${t.trainNumber}', '${c.classCode}', ${c.fare})">
-                                <div class="class-tile-top">
+                            <div class="class-tier-tile" onclick="chooseClassForTrain('${t.trainNumber}', '${c.classCode}')">
+                                <div class="class-tier-top">
                                     <span>${c.classCode}</span>
-                                    <span class="class-tile-fare">₹${c.fare}</span>
+                                    <span class="class-tier-fare">₹${c.fare}</span>
                                 </div>
                                 <div>
-                                    <span class="avail-badge ${badgeClass}">${c.availabilityText}</span>
+                                    <span class="status-badge ${badgeClass}">${c.availabilityText}</span>
                                 </div>
                             </div>
                         `;
@@ -951,50 +1132,50 @@
 
                     return `
                         <div class="train-result-card" id="train-card-${t.trainNumber}">
-                            <div class="train-header-row">
+                            <div class="train-card-header">
                                 <div>
-                                    <div class="train-name-title">${t.trainNumber} • ${t.trainName}</div>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Runs Daily • ${t.trainType || 'Express'} • Zone: ${t.zone || 'IR'}</span>
+                                    <div class="train-title-name">${t.trainNumber} • ${t.trainName}</div>
+                                    <div class="train-meta-specs">Runs Daily • ${t.trainType || 'Superfast'} • Zone: ${t.zone || 'IR'}</div>
                                 </div>
-                                <span class="avail-badge ${t.quota === 'TATKAL' ? 'avail-amber' : 'avail-green'}">Quota: ${t.quota}</span>
+                                <span class="status-badge ${t.quota === 'TATKAL' ? 'badge-rac' : 'badge-available'}">Quota: ${t.quota}</span>
                             </div>
 
-                            <div class="train-schedule-strip">
-                                <div class="time-box">
+                            <div class="train-route-timeline">
+                                <div class="station-time-block">
                                     <h3>${t.departureTime}</h3>
                                     <p>${t.fromStationName} (${t.fromStationCode})</p>
                                 </div>
 
-                                <div class="route-center">
-                                    <div style="font-size: 0.82rem; font-weight: 700; color: #475569;">${t.duration}</div>
-                                    <div class="route-line-visual"></div>
+                                <div class="route-distance-bar">
+                                    <div class="route-duration-text">${t.duration}</div>
+                                    <div class="route-arrow-line"></div>
                                     <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">${t.distanceKm} km</div>
                                 </div>
 
-                                <div class="time-box" style="text-align: right;">
+                                <div class="station-time-block" style="text-align: right;">
                                     <h3>${t.arrivalTime}</h3>
                                     <p>${t.toStationName} (${t.toStationCode})</p>
                                 </div>
                             </div>
 
-                            <div class="classes-tiles-grid">
+                            <div class="class-tiles-row">
                                 ${classesHtml}
                             </div>
 
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; flex-wrap: wrap; gap: 8px;">
+                            <div class="train-actions-strip">
                                 <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-coach-map" onclick="viewTrainSchedule('${t.trainNumber}')">
+                                    <button type="button" class="btn-action-tool" onclick="openTimetableSchedule('${t.trainNumber}')">
                                         📋 Timetable
                                     </button>
-                                    <button type="button" class="btn-coach-map" onclick="openCoachLayout('${t.trainNumber}')">
-                                        🪑 Coach Map
+                                    <button type="button" class="btn-action-tool" onclick="openCoachLayoutForTrain('${t.trainNumber}')">
+                                        🪑 Coach Map & Pick Seat
                                     </button>
-                                    <button type="button" class="btn-coach-map" onclick="trackTrainDirect('${t.trainNumber}')">
+                                    <button type="button" class="btn-action-tool" onclick="trackLiveTrainFromCard('${t.trainNumber}')">
                                         📍 Live Spot
                                     </button>
                                 </div>
 
-                                <button type="button" class="btn-book-now" onclick="openBookingModal('${t.trainNumber}')">
+                                <button type="button" class="btn-book-cta" onclick="openCheckoutFlow('${t.trainNumber}')">
                                     Book Now ➔
                                 </button>
                             </div>
@@ -1003,214 +1184,491 @@
                 }).join('');
 
             } catch (err) {
-                console.error(err);
-                showToast('Failed to query trains. Ensure server is running.', 'error');
+                container.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 30px;">Error loading trains.</p>';
             }
         }
 
-        function selectClassForTrain(trainNum, classCode) {
+        function chooseClassForTrain(trainNum, classCode) {
             const card = document.getElementById(`train-card-${trainNum}`);
             if (card) {
-                card.querySelectorAll('.class-tile').forEach(t => t.classList.remove('active'));
+                card.querySelectorAll('.class-tier-tile').forEach(t => t.classList.remove('active'));
                 event.currentTarget.classList.add('active');
             }
             selectedClass = classCode;
         }
 
-        // Live NTES Running Status
-        async function fetchLiveTrainStatus(tNumParam) {
-            const tNum = tNumParam || document.getElementById('live-train-input').value.trim() || '12002';
-            const view = document.getElementById('live-status-view');
-            view.innerHTML = '<p style="text-align: center; padding: 24px;">Tracking train GPS & station signals...</p>';
+        // Live Running Status (NTES)
+        function handleNtesTrainInput() {
+            clearTimeout(trainDebounce);
+            const input = document.getElementById('ntes-train-query');
+            const dropdown = document.getElementById('ntes-train-dropdown');
+            const val = input.value.trim();
+
+            if (val.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            trainDebounce = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/trains/lookup?q=${encodeURIComponent(val)}`);
+                    const list = await res.json();
+                    if (!list || list.length === 0) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    dropdown.innerHTML = list.map(t => `
+                        <div class="autocomplete-option" onclick="pickNtesTrain('${t.trainNumber}', '${t.trainName}')">
+                            <div>
+                                <strong>${t.trainNumber} - ${t.trainName}</strong>
+                                <div style="font-size: 0.75rem; color: #64748b;">${t.fromStationName} ➔ ${t.toStationName}</div>
+                            </div>
+                            <span class="station-code-chip">${t.trainNumber}</span>
+                        </div>
+                    `).join('');
+                    dropdown.style.display = 'block';
+                } catch (ignored) {}
+            }, 200);
+        }
+
+        function pickNtesTrain(num, name) {
+            document.getElementById('ntes-train-query').value = num;
+            document.getElementById('ntes-train-dropdown').style.display = 'none';
+            fetchLiveStatus();
+        }
+
+        async function fetchLiveStatus() {
+            const q = document.getElementById('ntes-train-query').value.trim() || '12002';
+            const offset = document.getElementById('ntes-day-offset').value;
+            const view = document.getElementById('ntes-live-result-display');
+            view.innerHTML = '<p style="text-align: center; padding: 24px; color: var(--text-muted);">Tracking train GPS & station signals...</p>';
 
             try {
-                const res = await fetch(`/api/trains/live-status?trainNumber=${tNum}`);
+                const res = await fetch(`/api/trains/live-status?trainNumber=${encodeURIComponent(q)}&dayOffset=${offset}`);
                 const data = await res.json();
 
+                if (data.error) {
+                    view.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px; background: #fff5f5; border-radius: var(--radius-md);">❌ ${data.error}</div>`;
+                    return;
+                }
+
                 const isDelayed = data.delayMinutes > 0;
-                const timelineHtml = (data.stops || []).map(s => `
-                    <div class="track-node ${s.state === 'PASSED' ? 'passed' : s.state === 'CURRENT' ? 'current' : ''}">
-                        <div class="track-bullet"></div>
-                        <div class="track-station-title">${s.stationName} (${s.stationCode})</div>
-                        <div class="track-meta">
-                            Platform ${s.platform} • Arr: ${s.arrivalTime} • Dep: ${s.departureTime} • Halt: ${s.haltMinutes} min • ${s.distanceKm} km
+                const timelineHtml = (data.stops || []).map((s, idx) => `
+                    <div class="live-station-node ${s.state === 'PASSED' ? 'passed' : s.state === 'CURRENT' ? 'current' : ''}">
+                        <div class="station-bullet-dot">${s.state === 'PASSED' ? '✓' : idx + 1}</div>
+                        <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${s.stationName} (${s.stationCode})</div>
+                        <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">
+                            Platform ${s.platform} • Arr: <strong>${s.arrivalTime}</strong> • Dep: <strong>${s.departureTime}</strong> • Halt: ${s.haltMinutes} min • ${s.distanceKm} km
                         </div>
                     </div>
                 `).join('');
 
                 view.innerHTML = `
-                    <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <div class="live-status-hero">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                             <div>
-                                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-dark);">${data.trainNumber} - ${data.trainName}</h3>
-                                <p style="font-size: 0.85rem; color: var(--text-muted);">${data.fromStation} ➔ ${data.toStation}</p>
+                                <h3 style="font-size: 1.4rem; font-weight: 800;">${data.trainNumber} - ${data.trainName}</h3>
+                                <p style="font-size: 0.88rem; color: #cbd5e1;">${data.fromStation} ➔ ${data.toStation} • Total Distance: ${data.totalDistanceKm} km</p>
                             </div>
-                            <span class="avail-badge ${isDelayed ? 'avail-amber' : 'avail-green'}" style="font-size: 0.88rem;">
+                            <span class="status-badge ${isDelayed ? 'badge-waitlist' : 'badge-available'}" style="font-size: 0.95rem; padding: 6px 14px;">
                                 ${data.delayStatus}
                             </span>
                         </div>
 
-                        <div style="background: #ffffff; padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; background: rgba(255,255,255,0.1); padding: 14px; border-radius: var(--radius-sm);">
                             <div>
-                                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">CURRENT LOCATION</span>
-                                <div style="font-size: 1rem; font-weight: 800; color: var(--primary);">${data.currentStatus}</div>
+                                <span style="font-size: 0.72rem; color: #cbd5e1; font-weight: 700;">CURRENT LOCATION</span>
+                                <div style="font-size: 1.05rem; font-weight: 800;">${data.currentStatus}</div>
                             </div>
                             <div>
-                                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">CURRENT SPEED</span>
-                                <div style="font-size: 1rem; font-weight: 800; color: #047857;">${data.speed}</div>
+                                <span style="font-size: 0.72rem; color: #cbd5e1; font-weight: 700;">SPEED</span>
+                                <div style="font-size: 1.05rem; font-weight: 800; color: #34d399;">${data.speed}</div>
+                            </div>
+                            <div>
+                                <span style="font-size: 0.72rem; color: #cbd5e1; font-weight: 700;">NEXT STOP</span>
+                                <div style="font-size: 1.05rem; font-weight: 800;">${data.nextStop}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 10px 0;">
+                        ${timelineHtml}
+                    </div>
+                `;
+            } catch (err) {
+                view.innerHTML = '<p style="color: var(--danger); text-align: center; padding: 24px;">Failed to fetch live status.</p>';
+            }
+        }
+
+        function trackLiveTrainFromCard(trainNum) {
+            document.getElementById('ntes-train-query').value = trainNum;
+            switchNavTab('live');
+            fetchLiveStatus();
+        }
+
+        // Authentic Interactive Coach Layout
+        async function loadInteractiveCoachMap() {
+            const tNum = document.getElementById('coach-filter-train').value.trim() || '12002';
+            const cType = document.getElementById('coach-filter-class').value;
+            const date = document.getElementById('route-date-input').value;
+            const workspace = document.getElementById('coach-interactive-workspace');
+
+            workspace.innerHTML = '<p style="text-align: center; padding: 30px; color: var(--text-muted);">Generating authentic coach architecture...</p>';
+
+            try {
+                const res = await fetch(`/api/coach/layout?trainNumber=${encodeURIComponent(tNum)}&classType=${cType}&date=${encodeURIComponent(date)}`);
+                const data = await res.json();
+
+                // Group seats into Bays
+                // 3A/SL: 8 berths per bay (6 compartment + 2 side)
+                // 2A: 6 berths per bay (4 compartment + 2 side)
+                // CC: 5 seats per row (3 left + 2 right)
+                const baySize = (cType === '3A' || cType === 'SL') ? 8 : (cType === '2A') ? 6 : 5;
+                const totalSeats = data.seats.length;
+                let baysHtml = '';
+
+                for (let i = 0; i < totalSeats; i += baySize) {
+                    const bayNum = Math.floor(i / baySize) + 1;
+                    const baySeats = data.seats.slice(i, i + baySize);
+
+                    if (cType === '3A' || cType === 'SL') {
+                        const compSeats = baySeats.slice(0, 6);
+                        const sideSeats = baySeats.slice(6, 8);
+
+                        baysHtml += `
+                            <div class="coach-bay-unit">
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 800; color: #64748b; margin-bottom: 6px;">BAY #${bayNum} (COMPARTMENT)</div>
+                                    <div class="bay-compartment">
+                                        ${compSeats.map(s => renderBerthButton(s, data.coach)).join('')}
+                                    </div>
+                                </div>
+                                <div class="bay-aisle">AISLE</div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 800; color: #64748b; margin-bottom: 6px;">SIDE BERTHS 🪟</div>
+                                    <div class="bay-side">
+                                        ${sideSeats.map(s => renderBerthButton(s, data.coach)).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (cType === '2A') {
+                        const compSeats = baySeats.slice(0, 4);
+                        const sideSeats = baySeats.slice(4, 6);
+
+                        baysHtml += `
+                            <div class="coach-bay-unit">
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 800; color: #64748b; margin-bottom: 6px;">BAY #${bayNum}</div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                        ${compSeats.map(s => renderBerthButton(s, data.coach)).join('')}
+                                    </div>
+                                </div>
+                                <div class="bay-aisle">AISLE</div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 800; color: #64748b; margin-bottom: 6px;">SIDE 🪟</div>
+                                    <div class="bay-side">
+                                        ${sideSeats.map(s => renderBerthButton(s, data.coach)).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        baysHtml += `
+                            <div class="coach-bay-unit" style="grid-template-columns: 1fr 40px 1fr;">
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                                    ${baySeats.slice(0, 3).map(s => renderBerthButton(s, data.coach)).join('')}
+                                </div>
+                                <div class="bay-aisle">AISLE</div>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                                    ${baySeats.slice(3, 5).map(s => renderBerthButton(s, data.coach)).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                workspace.innerHTML = `
+                    <div class="coach-container-box">
+                        <div class="coach-header-info">
+                            <div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">SELECTED COACH</span>
+                                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">Coach ${data.coach} (${data.classType}) — ${data.totalSeats} Total Berths</h3>
+                            </div>
+                            <div style="display: flex; gap: 14px; font-size: 0.82rem; font-weight: 700;">
+                                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 14px; background: #fff; border: 2px solid #cbd5e1; border-radius: 4px;"></span> Available</span>
+                                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 14px; background: #fee2e2; border: 2px solid #fca5a5; border-radius: 4px;"></span> Occupied</span>
+                                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 14px; background: #dbeafe; border: 2px solid #2563eb; border-radius: 4px;"></span> Selected</span>
                             </div>
                         </div>
 
-                        <div class="track-timeline">
-                            ${timelineHtml}
+                        <div class="coach-bay-wrapper">
+                            <div class="coach-direction-indicator">➔ TRAIN DIRECTION (ENGINE THIS WAY) ➔</div>
+                            <div class="coach-bay-grid">
+                                ${baysHtml}
+                            </div>
+                        </div>
+
+                        <div class="coach-selection-summary-bar">
+                            <div>
+                                <span style="font-size: 0.8rem; color: #94a3b8; font-weight: 700;">SELECTED BERTHS</span>
+                                <div style="font-size: 1.15rem; font-weight: 800;" id="coach-selected-list">None Selected (Click any available seat above)</div>
+                            </div>
+                            <button type="button" class="btn-primary-action" id="btn-book-picked-seats" style="height: 42px;" onclick="bookWithSelectedSeats('${tNum}', '${data.coach}', '${data.classType}')">
+                                🔒 Book Selected Berths
+                            </button>
                         </div>
                     </div>
                 `;
             } catch (err) {
-                view.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 24px;">Failed to fetch live status.</p>';
+                workspace.innerHTML = '<p style="color: var(--danger); text-align: center; padding: 24px;">Failed to load coach layout.</p>';
             }
         }
 
-        function trackTrainDirect(tNum) {
-            document.getElementById('live-train-input').value = tNum;
-            switchTab('live');
-            fetchLiveTrainStatus(tNum);
+        function renderBerthButton(seat, coach) {
+            const isSelected = selectedCoachSeats.some(s => s.seatNumber === seat.seatNumber && s.coach === coach);
+            const classes = `berth-cell-btn ${seat.occupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            const title = seat.occupied ? `Booked by ${seat.passenger.passengerName}` : `Click to Select Seat #${seat.seatNumber} (${seat.berthType})`;
+
+            return `
+                <div class="${classes}" title="${title}" onclick="toggleSeatChoice(${seat.seatNumber}, '${seat.berthType}', '${coach}', ${seat.occupied})">
+                    <div class="berth-cell-num">${seat.seatNumber}</div>
+                    <div class="berth-cell-type">${seat.berthType.substring(0, 2)}</div>
+                </div>
+            `;
         }
 
-        // View Timetable Schedule Modal
-        async function viewTrainSchedule(trainNumber) {
-            const modal = document.getElementById('schedule-modal');
-            const body = document.getElementById('schedule-modal-body');
-            document.getElementById('schedule-modal-title').innerText = `Train ${trainNumber} Complete Timetable`;
-            body.innerHTML = '<p style="text-align: center; padding: 20px;">Loading schedule stops...</p>';
+        function toggleSeatChoice(seatNum, berthType, coach, isOccupied) {
+            if (isOccupied) {
+                showNotification(`Seat #${seatNum} is already occupied.`, 'warning');
+                return;
+            }
+
+            const existingIdx = selectedCoachSeats.findIndex(s => s.seatNumber === seatNum && s.coach === coach);
+            if (existingIdx >= 0) {
+                selectedCoachSeats.splice(existingIdx, 1);
+            } else {
+                selectedCoachSeats.push({ seatNumber: seatNum, berthType, coach });
+            }
+
+            // Update UI list
+            const label = document.getElementById('coach-selected-list');
+            if (label) {
+                if (selectedCoachSeats.length === 0) {
+                    label.innerText = 'None Selected (Click any available seat above)';
+                } else {
+                    label.innerText = selectedCoachSeats.map(s => `${s.coach}-${s.seatNumber} (${s.berthType})`).join(', ');
+                }
+            }
+
+            loadInteractiveCoachMap(); // Re-render active state
+        }
+
+        function bookWithSelectedSeats(trainNumber, coach, classType) {
+            if (selectedCoachSeats.length === 0) {
+                showNotification('Please click on at least one available seat to select it!', 'warning');
+                return;
+            }
+
+            openCheckoutFlow(trainNumber, selectedCoachSeats);
+        }
+
+        function openCoachLayoutForTrain(trainNum) {
+            document.getElementById('coach-filter-train').value = trainNum;
+            switchNavTab('coach');
+            loadInteractiveCoachMap();
+        }
+
+        // Timetable Schedule Modal
+        async function openTimetableSchedule(trainNumber) {
+            const modal = document.getElementById('modal-timetable');
+            const body = document.getElementById('timetable-modal-body');
+            document.getElementById('timetable-modal-title').innerText = `Train ${trainNumber} Official Route Timetable`;
+            body.innerHTML = '<p style="text-align: center; padding: 24px;">Loading timetable...</p>';
             modal.classList.add('open');
 
             try {
-                const res = await fetch(`/api/trains/schedule?trainNumber=${trainNumber}`);
+                const res = await fetch(`/api/trains/schedule?trainNumber=${encodeURIComponent(trainNumber)}`);
                 const stops = await res.json();
 
                 body.innerHTML = `
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
-                        <thead>
-                            <tr style="background: #f1f5f9; text-align: left; text-transform: uppercase; font-size: 0.78rem;">
-                                <th style="padding: 10px;">#</th>
-                                <th style="padding: 10px;">Station Name</th>
-                                <th style="padding: 10px;">Code</th>
-                                <th style="padding: 10px;">Arr Time</th>
-                                <th style="padding: 10px;">Dep Time</th>
-                                <th style="padding: 10px;">Halt</th>
-                                <th style="padding: 10px;">Platform</th>
-                                <th style="padding: 10px;">Distance</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${stops.map(s => `
-                                <tr style="border-bottom: 1px solid var(--border);">
-                                    <td style="padding: 8px 10px;">${s.sequence}</td>
-                                    <td style="padding: 8px 10px;"><strong>${s.stationName}</strong></td>
-                                    <td style="padding: 8px 10px;"><span class="code-badge">${s.stationCode}</span></td>
-                                    <td style="padding: 8px 10px;">${s.arrivalTime}</td>
-                                    <td style="padding: 8px 10px;">${s.departureTime}</td>
-                                    <td style="padding: 8px 10px;">${s.haltMinutes} min</td>
-                                    <td style="padding: 8px 10px;">PF ${s.platform}</td>
-                                    <td style="padding: 8px 10px;">${s.distanceKm} km</td>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                            <thead>
+                                <tr style="background: #f1f5f9; text-align: left; text-transform: uppercase; font-size: 0.78rem;">
+                                    <th style="padding: 10px;">#</th>
+                                    <th style="padding: 10px;">Station Name</th>
+                                    <th style="padding: 10px;">Code</th>
+                                    <th style="padding: 10px;">Arr Time</th>
+                                    <th style="padding: 10px;">Dep Time</th>
+                                    <th style="padding: 10px;">Halt</th>
+                                    <th style="padding: 10px;">Platform</th>
+                                    <th style="padding: 10px;">Distance</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${stops.map(s => `
+                                    <tr style="border-bottom: 1px solid var(--border);">
+                                        <td style="padding: 8px 10px;">${s.sequence}</td>
+                                        <td style="padding: 8px 10px;"><strong>${s.stationName}</strong></td>
+                                        <td style="padding: 8px 10px;"><span class="station-code-chip">${s.stationCode}</span></td>
+                                        <td style="padding: 8px 10px;">${s.arrivalTime}</td>
+                                        <td style="padding: 8px 10px;">${s.departureTime}</td>
+                                        <td style="padding: 8px 10px;">${s.haltMinutes} min</td>
+                                        <td style="padding: 8px 10px;">PF ${s.platform}</td>
+                                        <td style="padding: 8px 10px;">${s.distanceKm} km</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
             } catch (err) {
-                body.innerHTML = '<p style="text-align: center; color: var(--danger);">Failed to load timetable.</p>';
+                body.innerHTML = '<p style="color: var(--danger); text-align: center;">Failed to load timetable.</p>';
             }
         }
-
-        function closeScheduleModal() {
-            document.getElementById('schedule-modal').classList.remove('open');
+        function closeTimetableModal() {
+            document.getElementById('modal-timetable').classList.remove('open');
         }
 
-        // Master Passenger List Management
-        async function loadMasterPassengers() {
-            try {
-                const res = await fetch(`/api/user/master-passengers?userId=${currentUser.userId}`);
-                masterPassengers = await res.json();
-                renderMasterPassengersList();
-                renderBookingMasterPills();
-            } catch (ignored) {}
-        }
+        // Checkout Flow
+        function openCheckoutFlow(trainNumber, preSelectedSeats = null) {
+            selectedTrain = currentSearchResults.find(t => t.trainNumber === trainNumber) || {
+                trainNumber: trainNumber, trainName: 'Express', fromStationCode: 'NDLS', toStationCode: 'BPL',
+                availableClasses: [{ classCode: '3A', fare: 1200 }]
+            };
 
-        function renderMasterPassengersList() {
-            const tbody = document.getElementById('master-passengers-tbody');
-            if (!tbody) return;
-
-            if (!masterPassengers || masterPassengers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">No saved co-passengers in master list. Click "Add New Co-Passenger" above.</td></tr>';
-                return;
+            if (!selectedClass && selectedTrain.availableClasses && selectedTrain.availableClasses.length > 0) {
+                selectedClass = selectedTrain.availableClasses[0].classCode;
             }
 
-            tbody.innerHTML = masterPassengers.map(p => `
-                <tr style="border-bottom: 1px solid var(--border); font-size: 0.9rem;">
-                    <td style="padding: 10px;"><strong>${p.passengerName}</strong></td>
-                    <td style="padding: 10px;">${p.age} Yrs / ${p.gender}</td>
-                    <td style="padding: 10px;">${p.berthPreference}</td>
-                    <td style="padding: 10px;">${p.idCardType}</td>
-                    <td style="padding: 10px;">${p.idCardNumber || '--'}</td>
-                    <td style="padding: 10px; text-align: right;">
-                        <button type="button" class="btn-remove" onclick="deleteMasterPassenger(${p.id})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
+            document.getElementById('checkout-train-heading').innerText = `${selectedTrain.trainNumber} - ${selectedTrain.trainName}`;
+            document.getElementById('checkout-train-sub').innerText = `${selectedTrain.fromStationCode} ➔ ${selectedTrain.toStationCode} • Class: ${selectedClass} • Date: ${document.getElementById('route-date-input').value}`;
+
+            const container = document.getElementById('passengers-form-container');
+            container.innerHTML = '';
+            passengerFormCount = 0;
+
+            if (preSelectedSeats && preSelectedSeats.length > 0) {
+                preSelectedSeats.forEach(s => {
+                    addPassengerFormField(s.berthType, s.seatNumber, s.coach);
+                });
+            } else if (masterPassengers.length > 0) {
+                addPassengerFromMasterToForm(masterPassengers[0]);
+            } else {
+                addPassengerFormField();
+            }
+
+            renderCheckoutMasterPills();
+            document.getElementById('modal-checkout').classList.add('open');
+            recalculateCheckoutFare();
         }
 
-        function renderBookingMasterPills() {
-            const container = document.getElementById('booking-master-pills');
+        function closeCheckoutModal() {
+            document.getElementById('modal-checkout').classList.remove('open');
+        }
+
+        function addPassengerFormField(prefBerth = 'No Preference', seatNum = null, coach = null) {
+            passengerFormCount++;
+            const container = document.getElementById('passengers-form-container');
+            const row = document.createElement('div');
+            row.className = 'passenger-item';
+            row.id = `p-field-row-${passengerFormCount}`;
+            row.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: var(--primary);">Passenger #${container.children.length + 1} ${seatNum ? `• Reserved Seat: ${coach}-${seatNum}` : ''}</strong>
+                    ${container.children.length > 0 ? `<button type="button" class="btn-action-tool" style="color: var(--danger); border: none;" onclick="removePassengerFormField(${passengerFormCount})">✕ Remove</button>` : ''}
+                </div>
+                <div class="route-search-grid" style="grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 10px;">
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Full Name</label>
+                        <input type="text" class="p-field-name" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;" placeholder="Passenger Name" required>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Age</label>
+                        <input type="number" class="p-field-age" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;" min="1" max="110" value="28" required>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Gender</label>
+                        <select class="p-field-gender" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Berth Choice</label>
+                        <select class="p-field-berth" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="Lower" ${prefBerth === 'Lower' ? 'selected' : ''}>Lower Berth</option>
+                            <option value="Middle" ${prefBerth === 'Middle' ? 'selected' : ''}>Middle Berth</option>
+                            <option value="Upper" ${prefBerth === 'Upper' ? 'selected' : ''}>Upper Berth</option>
+                            <option value="Side Lower" ${prefBerth === 'Side Lower' ? 'selected' : ''}>Side Lower</option>
+                            <option value="Side Upper" ${prefBerth === 'Side Upper' ? 'selected' : ''}>Side Upper</option>
+                            <option value="No Preference" ${prefBerth === 'No Preference' ? 'selected' : ''}>No Preference</option>
+                        </select>
+                    </div>
+                </div>
+                ${seatNum ? `<input type="hidden" class="p-field-seat" value="${seatNum}"><input type="hidden" class="p-field-coach" value="${coach}">` : ''}
+            `;
+            container.appendChild(row);
+            recalculateCheckoutFare();
+        }
+
+        function removePassengerFormField(idx) {
+            const el = document.getElementById(`p-field-row-${idx}`);
+            if (el) el.remove();
+            recalculateCheckoutFare();
+        }
+
+        function renderCheckoutMasterPills() {
+            const container = document.getElementById('checkout-master-pills');
             if (!container) return;
-
             if (!masterPassengers || masterPassengers.length === 0) {
-                container.innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">No saved master passengers. Add passengers below.</span>';
+                container.innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">No saved master passengers yet.</span>';
                 return;
             }
-
             container.innerHTML = masterPassengers.map(p => `
-                <button type="button" class="master-pill" onclick='addPassengerFromMaster(${JSON.stringify(p)})'>
-                    <span>+</span> ${p.passengerName} (${p.age}/${p.gender.charAt(0)})
+                <button type="button" class="btn-action-tool" style="font-size: 0.8rem; padding: 4px 10px;" onclick='addPassengerFromMasterToForm(${JSON.stringify(p)})'>
+                    + ${p.passengerName} (${p.age}/${p.gender.charAt(0)})
                 </button>
             `).join('');
         }
 
-        function addPassengerFromMaster(p) {
-            passengerIndex++;
-            const container = document.getElementById('passengers-container');
+        function addPassengerFromMasterToForm(p) {
+            passengerFormCount++;
+            const container = document.getElementById('passengers-form-container');
             const row = document.createElement('div');
             row.className = 'passenger-item';
-            row.id = `p-row-${passengerIndex}`;
+            row.id = `p-field-row-${passengerFormCount}`;
             row.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong style="color: var(--primary);">Passenger #${container.children.length + 1}</strong>
-                    <button type="button" class="btn-remove" onclick="removePassengerRow(${passengerIndex})">✕ Remove</button>
+                    <button type="button" class="btn-action-tool" style="color: var(--danger); border: none;" onclick="removePassengerFormField(${passengerFormCount})">✕ Remove</button>
                 </div>
-                <div class="form-grid-4">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" class="form-control p-name" value="${p.passengerName}" required>
+                <div class="route-search-grid" style="grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 10px;">
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Full Name</label>
+                        <input type="text" class="p-field-name" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;" value="${p.passengerName}" required>
                     </div>
-                    <div class="form-group">
-                        <label>Age</label>
-                        <input type="number" class="form-control p-age" value="${p.age}" min="1" max="110" required>
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Age</label>
+                        <input type="number" class="p-field-age" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;" min="1" max="110" value="${p.age}" required>
                     </div>
-                    <div class="form-group">
-                        <label>Gender</label>
-                        <select class="form-control p-gender">
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Gender</label>
+                        <select class="p-field-gender" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;">
                             <option value="Male" ${p.gender === 'Male' ? 'selected' : ''}>Male</option>
                             <option value="Female" ${p.gender === 'Female' ? 'selected' : ''}>Female</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Berth Preference</label>
-                        <select class="form-control p-berth">
-                            <option value="Lower" ${p.berthPreference === 'Lower' ? 'selected' : ''}>Lower Berth</option>
-                            <option value="Middle" ${p.berthPreference === 'Middle' ? 'selected' : ''}>Middle Berth</option>
-                            <option value="Upper" ${p.berthPreference === 'Upper' ? 'selected' : ''}>Upper Berth</option>
+                    <div>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;">Berth Choice</label>
+                        <select class="p-field-berth" style="width: 100%; padding: 9px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="Lower" ${p.berthPreference === 'Lower' ? 'selected' : ''}>Lower</option>
+                            <option value="Middle" ${p.berthPreference === 'Middle' ? 'selected' : ''}>Middle</option>
+                            <option value="Upper" ${p.berthPreference === 'Upper' ? 'selected' : ''}>Upper</option>
                             <option value="Side Lower" ${p.berthPreference === 'Side Lower' ? 'selected' : ''}>Side Lower</option>
                             <option value="Side Upper" ${p.berthPreference === 'Side Upper' ? 'selected' : ''}>Side Upper</option>
                             <option value="No Preference">No Preference</option>
@@ -1219,180 +1677,49 @@
                 </div>
             `;
             container.appendChild(row);
-            recalcTotalFare();
+            recalculateCheckoutFare();
         }
 
-        async function saveMasterPassenger(e) {
-            e.preventDefault();
-            const payload = {
-                userId: currentUser.userId,
-                name: document.getElementById('m-name').value.trim(),
-                age: parseInt(document.getElementById('m-age').value),
-                gender: document.getElementById('m-gender').value,
-                berthPreference: document.getElementById('m-berth').value,
-                idCardType: document.getElementById('m-idtype').value,
-                idCardNumber: document.getElementById('m-idnum').value.trim()
-            };
-
-            try {
-                const res = await fetch('/api/user/master-passengers', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) throw new Error('Failed to save passenger');
-                showToast('Passenger added to Master List', 'success');
-                closeAddMasterModal();
-                loadMasterPassengers();
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        async function deleteMasterPassenger(id) {
-            if (!confirm('Delete passenger from Master List?')) return;
-            try {
-                const res = await fetch('/api/user/master-passengers/delete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, userId: currentUser.userId })
-                });
-                showToast('Passenger deleted', 'success');
-                loadMasterPassengers();
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        function openAddMasterModal() {
-            document.getElementById('add-master-modal').classList.add('open');
-        }
-        function closeAddMasterModal() {
-            document.getElementById('add-master-modal').classList.remove('open');
-        }
-
-        // Booking Modal & Passenger Rows
-        function openBookingModal(trainNumber) {
-            selectedTrain = currentSearchTrains.find(t => t.trainNumber === trainNumber);
-            if (!selectedTrain) return;
-
-            if (!selectedClass && selectedTrain.availableClasses.length > 0) {
-                selectedClass = selectedTrain.availableClasses[0].classCode;
-            }
-
-            document.getElementById('book-modal-title').innerText = `${selectedTrain.trainNumber} - ${selectedTrain.trainName}`;
-            document.getElementById('book-modal-sub').innerText = `${selectedTrain.fromStationName} ➔ ${selectedTrain.toStationName} • Class: ${selectedClass} • Quota: ${selectedTrain.quota}`;
-
-            const container = document.getElementById('passengers-container');
-            container.innerHTML = '';
-            passengerIndex = 0;
-
-            // If master passengers exist, auto-add first one
-            if (masterPassengers.length > 0) {
-                addPassengerFromMaster(masterPassengers[0]);
-            } else {
-                addPassengerRow();
-            }
-
-            renderBookingMasterPills();
-            document.getElementById('booking-modal').classList.add('open');
-            recalcTotalFare();
-        }
-
-        function closeBookingModal() {
-            document.getElementById('booking-modal').classList.remove('open');
-        }
-
-        function addPassengerRow() {
-            passengerIndex++;
-            const container = document.getElementById('passengers-container');
-            const row = document.createElement('div');
-            row.className = 'passenger-item';
-            row.id = `p-row-${passengerIndex}`;
-            row.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: var(--primary);">Passenger #${container.children.length + 1}</strong>
-                    ${container.children.length > 0 ? `<button type="button" class="btn-remove" onclick="removePassengerRow(${passengerIndex})">✕ Remove</button>` : ''}
-                </div>
-                <div class="form-grid-4">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" class="form-control p-name" placeholder="Passenger Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Age</label>
-                        <input type="number" class="form-control p-age" placeholder="Age" min="1" max="110" value="28" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Gender</label>
-                        <select class="form-control p-gender">
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Berth Preference</label>
-                        <select class="form-control p-berth">
-                            <option value="Lower">Lower Berth</option>
-                            <option value="Middle">Middle Berth</option>
-                            <option value="Upper">Upper Berth</option>
-                            <option value="Side Lower">Side Lower</option>
-                            <option value="Side Upper">Side Upper</option>
-                            <option value="No Preference">No Preference</option>
-                        </select>
-                    </div>
-                </div>
-            `;
-            container.appendChild(row);
-            recalcTotalFare();
-        }
-
-        function removePassengerRow(idx) {
-            const r = document.getElementById(`p-row-${idx}`);
-            if (r) r.remove();
-            recalcTotalFare();
-        }
-
-        function selectPaymentMethod(method, el) {
-            selectedPayment = method;
-            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+        function choosePayment(method, el) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('#modal-checkout .class-tier-tile').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
         }
 
-        function recalcTotalFare() {
+        function recalculateCheckoutFare() {
             if (!selectedTrain) return;
-            const cObj = selectedTrain.availableClasses.find(c => c.classCode === selectedClass) || selectedTrain.availableClasses[0];
-            const baseFare = cObj ? cObj.fare : 1000;
-            const count = document.getElementById('passengers-container').children.length;
-            let total = baseFare * count;
+            const cObj = (selectedTrain.availableClasses || []).find(c => c.classCode === selectedClass) || { fare: 1200 };
+            const count = document.getElementById('passengers-form-container').children.length;
+            let total = cObj.fare * count;
 
-            if (document.getElementById('travel-insurance-chk').checked) {
+            if (document.getElementById('checkout-insurance-chk').checked) {
                 total += 0.35 * count;
             }
-
-            document.getElementById('modal-total-fare').innerText = `₹${total.toLocaleString('en-IN')}.00`;
+            document.getElementById('checkout-total-fare').innerText = `₹${total.toLocaleString('en-IN')}.00`;
         }
 
-        // Checkout & Booking Execution
-        async function proceedToCheckout(e) {
+        async function executeCheckout(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-confirm-pay');
+            const btn = document.getElementById('btn-submit-pay');
             btn.disabled = true;
-            btn.innerText = 'Authorizing Payment & Allocating Berths...';
+            btn.innerText = 'Locking Berths in PostgreSQL...';
 
             try {
-                const date = document.getElementById('search-date-input').value;
-                const quota = document.getElementById('search-quota-select').value;
-                const rows = document.querySelectorAll('.passenger-item');
+                const date = document.getElementById('route-date-input').value;
+                const quota = document.getElementById('route-quota-select').value;
+                const rows = document.querySelectorAll('#passengers-form-container .passenger-item');
                 const passengers = [];
 
                 rows.forEach(r => {
+                    const seatIn = r.querySelector('.p-field-seat');
+                    const coachIn = r.querySelector('.p-field-coach');
                     passengers.push({
-                        name: r.querySelector('.p-name').value.trim(),
-                        age: parseInt(r.querySelector('.p-age').value),
-                        gender: r.querySelector('.p-gender').value,
-                        berthPreference: r.querySelector('.p-berth').value,
+                        name: r.querySelector('.p-field-name').value.trim(),
+                        age: parseInt(r.querySelector('.p-field-age').value),
+                        gender: r.querySelector('.p-field-gender').value,
+                        berthPreference: r.querySelector('.p-field-berth').value,
+                        seatNumber: seatIn ? parseInt(seatIn.value) : null,
+                        coach: coachIn ? coachIn.value : null,
                         phone: '9876543210'
                     });
                 });
@@ -1405,9 +1732,9 @@
                     quota: quota,
                     fromStationCode: selectedTrain.fromStationCode,
                     toStationCode: selectedTrain.toStationCode,
-                    paymentMethod: selectedPayment,
-                    paymentId: 'PAY-' + selectedPayment.toUpperCase() + '-' + Math.floor(100000 + Math.random() * 900000),
-                    insuranceOpted: document.getElementById('travel-insurance-chk').checked,
+                    paymentMethod: selectedPaymentMethod,
+                    paymentId: 'PAY-' + selectedPaymentMethod.toUpperCase() + '-' + Math.floor(100000 + Math.random() * 900000),
+                    insuranceOpted: document.getElementById('checkout-insurance-chk').checked,
                     passengers: passengers
                 };
 
@@ -1420,34 +1747,35 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Booking failed');
 
-                closeBookingModal();
-                showToast(`Payment Successful! PNR: ${data.pnr}`, 'success');
-                renderDigitalTicket(data);
-                searchTrains(); // update seat counters
+                closeCheckoutModal();
+                selectedCoachSeats = []; // reset seat picks
+                showNotification(`Ticket Confirmed! PNR: ${data.pnr}`, 'success');
+                displayDigitalTicket(data);
+                executeSearch(); // refresh counters
 
             } catch (err) {
-                showToast(err.message, 'error');
+                showNotification(err.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerText = '🔒 Pay & Book Ticket';
             }
         }
 
-        // Digital Boarding Pass ERS
-        function renderDigitalTicket(ticket) {
-            const container = document.getElementById('ticket-modal-body');
+        // Render Digital ERS Boarding Pass
+        function displayDigitalTicket(ticket) {
+            const container = document.getElementById('digital-ticket-modal-body');
             const isCancelled = ticket.bookingStatus === 'CANCELLED';
 
             container.innerHTML = `
-                <div class="ers-ticket">
+                <div class="ers-digital-ticket">
                     ${isCancelled ? `<div style="background: var(--danger); color: #fff; text-align: center; padding: 10px; font-weight: 800; border-radius: 6px; margin-bottom: 14px;">⚠️ TICKET CANCELLED — REFUND INITIATED</div>` : ''}
-                    <div class="ers-header">
+                    <div class="ers-ticket-top">
                         <div>
-                            <h2 style="font-weight: 800; color: var(--primary-dark); font-size: 1.25rem;">INDIAN RAILWAYS — ELECTRONIC RESERVATION SLIP (ERS)</h2>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">IRCTC Official Digital Boarding Pass</p>
+                            <h2 style="font-weight: 800; color: var(--primary); font-size: 1.3rem;">INDIAN RAILWAYS — ELECTRONIC RESERVATION SLIP (ERS)</h2>
+                            <p style="font-size: 0.82rem; color: var(--text-muted);">IRCTC Official Digital Boarding Pass • Valid with Govt Photo ID</p>
                         </div>
-                        <div class="ers-pnr-box">
-                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">PNR NUMBER</span>
+                        <div class="ers-pnr-tag">
+                            <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">PNR NUMBER</span>
                             <strong>${ticket.pnr}</strong>
                         </div>
                     </div>
@@ -1471,7 +1799,7 @@
                         </div>
                     </div>
 
-                    <h4 style="font-size: 0.9rem; font-weight: 800; margin-bottom: 8px;">Passenger Berth Allocation</h4>
+                    <h4 style="font-size: 0.92rem; font-weight: 800; margin-bottom: 10px;">Passenger Berth Allocation</h4>
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
                         <thead>
                             <tr style="background: #f1f5f9; text-align: left; font-size: 0.8rem; text-transform: uppercase;">
@@ -1493,7 +1821,7 @@
                                     <td style="padding: 8px; font-weight: 800; color: var(--primary);">${p.coach || 'WL'}</td>
                                     <td style="padding: 8px; font-weight: 800;">${p.seatNumber || '--'}</td>
                                     <td style="padding: 8px;">${p.berthType || '--'}</td>
-                                    <td style="padding: 8px;"><strong style="color: #047857;">${p.currentStatus}</strong></td>
+                                    <td style="padding: 8px;"><strong style="color: var(--success);">${p.currentStatus}</strong></td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -1502,32 +1830,32 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px;">
                         <div>
                             <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">TOTAL FARE PAID</span>
-                            <div style="font-size: 1.4rem; font-weight: 800; color: #047857;">₹${ticket.totalFare.toLocaleString('en-IN')}.00</div>
+                            <div style="font-size: 1.45rem; font-weight: 800; color: var(--success);">₹${ticket.totalFare.toLocaleString('en-IN')}.00</div>
                         </div>
                         <div style="text-align: right;">
                             <div style="font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: #64748b;">||| | ||||| || |||| |||</div>
-                            <span style="font-size: 0.7rem; color: var(--text-muted);">IRCTC Digital Signature Token</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">IRCTC Cryptographic Boarding Pass</span>
                         </div>
                     </div>
                 </div>
             `;
-            document.getElementById('ticket-modal').classList.add('open');
+            document.getElementById('modal-digital-ticket').classList.add('open');
         }
 
-        function closeTicketModal() {
-            document.getElementById('ticket-modal').classList.remove('open');
+        function closeDigitalTicketModal() {
+            document.getElementById('modal-digital-ticket').classList.remove('open');
         }
 
-        // PNR Inquiry
-        async function checkPnrStatus() {
-            const pnr = document.getElementById('pnr-input').value.trim();
+        // PNR Lookup
+        async function executePnrLookup() {
+            const pnr = document.getElementById('pnr-search-input').value.trim();
             if (pnr.length !== 10) {
-                showToast('Enter valid 10-digit PNR', 'warning');
+                showNotification('Please enter a 10-digit PNR', 'warning');
                 return;
             }
 
-            const view = document.getElementById('pnr-result-view');
-            view.innerHTML = '<p style="text-align: center; padding: 20px;">Fetching live PNR status...</p>';
+            const view = document.getElementById('pnr-status-display');
+            view.innerHTML = '<p style="text-align: center; padding: 20px;">Querying PNR status...</p>';
 
             try {
                 const res = await fetch(`/api/pnr?pnr=${pnr}`);
@@ -1538,10 +1866,10 @@
                     <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; background: #ffffff;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                             <div>
-                                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);">PNR: ${data.pnr}</h3>
+                                <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">PNR: ${data.pnr}</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted);">${data.trainNumber} - ${data.trainName} • ${data.journeyDate}</p>
                             </div>
-                            <span class="avail-badge ${data.bookingStatus === 'CANCELLED' ? 'avail-red' : 'avail-green'}">
+                            <span class="status-badge ${data.bookingStatus === 'CANCELLED' ? 'badge-waitlist' : 'badge-available'}">
                                 ${data.bookingStatus}
                             </span>
                         </div>
@@ -1562,14 +1890,14 @@
                                         <td style="padding: 8px;">${i + 1}</td>
                                         <td style="padding: 8px;"><strong>${p.name}</strong></td>
                                         <td style="padding: 8px;">${p.bookingStatus}</td>
-                                        <td style="padding: 8px;"><strong style="color: #047857;">${p.currentStatus}</strong></td>
+                                        <td style="padding: 8px;"><strong style="color: var(--success);">${p.currentStatus}</strong></td>
                                         <td style="padding: 8px; font-weight: 800; color: var(--primary);">${p.coach ? p.coach + '-' + p.seatNumber : 'WL ' + p.waitlistNumber}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
                         </table>
 
-                        <button type="button" class="btn-coach-map" onclick='renderDigitalTicket(${JSON.stringify(data)})'>
+                        <button type="button" class="btn-action-tool" onclick='displayDigitalTicket(${JSON.stringify(data)})'>
                             View Complete Boarding Pass ➔
                         </button>
                     </div>
@@ -1580,14 +1908,14 @@
         }
 
         // Cancel Ticket Preview & Execution
-        async function previewCancelTicket() {
+        async function previewTicketCancellation() {
             const pnr = document.getElementById('cancel-pnr-input').value.trim();
             if (pnr.length !== 10) {
-                showToast('Enter valid 10-digit PNR', 'warning');
+                showNotification('Please enter a 10-digit PNR', 'warning');
                 return;
             }
 
-            const view = document.getElementById('cancel-preview-view');
+            const view = document.getElementById('cancel-ticket-preview');
             try {
                 const res = await fetch(`/api/pnr?pnr=${pnr}`);
                 const data = await res.json();
@@ -1598,7 +1926,7 @@
 
                 view.innerHTML = `
                     <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;">
-                        <h3 style="font-weight: 800; color: var(--primary-dark); margin-bottom: 6px;">Cancel PNR: ${data.pnr}</h3>
+                        <h3 style="font-weight: 800; color: var(--primary); margin-bottom: 6px;">Cancel PNR: ${data.pnr}</h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted);">${data.trainNumber} - ${data.trainName} • ${data.journeyDate}</p>
 
                         <div style="background: #ffffff; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin: 14px 0;">
@@ -1610,14 +1938,14 @@
                                 <span>IRCTC Cancellation Deduction:</span>
                                 <strong>- ₹${fee.toFixed(2)}</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; font-size: 1.15rem; color: #047857; border-top: 1px solid var(--border); padding-top: 8px;">
-                                <span>Net Refund to Bank/UPI:</span>
+                            <div style="display: flex; justify-content: space-between; font-size: 1.15rem; color: var(--success); border-top: 1px solid var(--border); padding-top: 8px;">
+                                <span>Net Refund Amount:</span>
                                 <strong>₹${refund.toFixed(2)}</strong>
                             </div>
                         </div>
 
                         ${data.bookingStatus !== 'CANCELLED' ? `
-                            <button type="button" class="btn-search" style="background: var(--danger); width: 100%; justify-content: center;" onclick="executeCancellation('${data.pnr}')">
+                            <button type="button" class="btn-primary-action" style="background: var(--danger); width: 100%; justify-content: center;" onclick="confirmTicketCancellation('${data.pnr}')">
                                 ⚠️ Confirm Cancellation & Auto-Promote Waitlist
                             </button>
                         ` : '<p style="color: var(--danger); font-weight: 700; text-align: center;">Ticket has already been cancelled.</p>'}
@@ -1628,7 +1956,7 @@
             }
         }
 
-        async function executeCancellation(pnr) {
+        async function confirmTicketCancellation(pnr) {
             if (!confirm(`Cancel ticket PNR: ${pnr}?`)) return;
             try {
                 const res = await fetch('/api/cancel', {
@@ -1638,56 +1966,96 @@
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Cancellation failed');
-                showToast(`Ticket ${pnr} cancelled! Refund of ₹${data.refundAmount} initiated.`, 'success');
-                previewCancelTicket();
+                showNotification(`Ticket ${pnr} cancelled! Refund of ₹${data.refundAmount} issued.`, 'success');
+                previewTicketCancellation();
             } catch (err) {
-                showToast(err.message, 'error');
+                showNotification(err.message, 'error');
             }
         }
 
-        // Coach Layout
-        async function loadCoachSeatMap(trainNumParam) {
-            const tNum = trainNumParam || document.getElementById('coach-train-input').value.trim() || '12002';
-            const cType = document.getElementById('coach-class-select').value;
-            const date = document.getElementById('search-date-input').value;
-            const view = document.getElementById('coach-layout-view');
-            view.innerHTML = '<p style="text-align: center; padding: 20px;">Loading coach layout...</p>';
+        // Master Passenger List
+        async function loadMasterPassengers() {
+            try {
+                const res = await fetch(`/api/user/master-passengers?userId=${currentUser.userId}`);
+                masterPassengers = await res.json();
+                renderMasterTable();
+                renderCheckoutMasterPills();
+            } catch (ignored) {}
+        }
+
+        function renderMasterTable() {
+            const tbody = document.getElementById('master-list-tbody');
+            if (!tbody) return;
+
+            if (!masterPassengers || masterPassengers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">No saved co-passengers.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = masterPassengers.map(p => `
+                <tr style="border-bottom: 1px solid var(--border); font-size: 0.9rem;">
+                    <td style="padding: 10px;"><strong>${p.passengerName}</strong></td>
+                    <td style="padding: 10px;">${p.age} Yrs / ${p.gender}</td>
+                    <td style="padding: 10px;">${p.berthPreference}</td>
+                    <td style="padding: 10px;">${p.idCardType}</td>
+                    <td style="padding: 10px;">${p.idCardNumber || '--'}</td>
+                    <td style="padding: 10px; text-align: right;">
+                        <button type="button" class="btn-action-tool" style="color: var(--danger); border: none;" onclick="deleteMasterPassengerRow(${p.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveMasterCoPassenger(e) {
+            e.preventDefault();
+            const payload = {
+                userId: currentUser.userId,
+                name: document.getElementById('m-add-name').value.trim(),
+                age: parseInt(document.getElementById('m-add-age').value),
+                gender: document.getElementById('m-add-gender').value,
+                berthPreference: document.getElementById('m-add-berth').value,
+                idCardType: document.getElementById('m-add-idtype').value,
+                idCardNumber: document.getElementById('m-add-idnum').value.trim()
+            };
 
             try {
-                const res = await fetch(`/api/coach/layout?trainNumber=${tNum}&classType=${cType}&date=${date}`);
-                const data = await res.json();
-
-                const berthsHtml = data.seats.map(s => `
-                    <div style="border: 2px solid ${s.occupied ? '#fca5a5' : '#cbd5e1'}; background: ${s.occupied ? '#fee2e2' : '#ffffff'}; border-radius: 6px; padding: 10px 4px; text-align: center;">
-                        <div style="font-weight: 800; font-size: 0.95rem; color: ${s.occupied ? '#991b1b' : '#0f172a'};">${s.seatNumber}</div>
-                        <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase;">${s.berthType.substring(0, 2)}</div>
-                    </div>
-                `).join('');
-
-                view.innerHTML = `
-                    <div style="background: #f1f5f9; border: 3px solid #94a3b8; border-radius: 14px; padding: 20px;">
-                        <div style="text-align: center; font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); margin-bottom: 12px;">Coach ${data.coach} (${data.classType}) — ${data.totalSeats} Total Berths</div>
-                        <div style="display: flex; gap: 14px; justify-content: center; font-size: 0.8rem; margin-bottom: 12px;">
-                            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #fff; border: 2px solid #cbd5e1; border-radius: 3px;"></span> Available</span>
-                            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #fee2e2; border: 2px solid #fca5a5; border-radius: 3px;"></span> Occupied</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">${berthsHtml}</div>
-                    </div>
-                `;
+                const res = await fetch('/api/user/master-passengers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('Failed to save');
+                showNotification('Co-passenger added to master list', 'success');
+                closeAddMasterModal();
+                loadMasterPassengers();
             } catch (err) {
-                view.innerHTML = '<p style="text-align: center; color: var(--danger);">Failed to load coach layout.</p>';
+                showNotification(err.message, 'error');
             }
         }
 
-        function openCoachLayout(tNum) {
-            document.getElementById('coach-train-input').value = tNum;
-            switchTab('coach');
-            loadCoachSeatMap(tNum);
+        async function deleteMasterPassengerRow(id) {
+            if (!confirm('Remove this co-passenger from master list?')) return;
+            try {
+                await fetch('/api/user/master-passengers/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, userId: currentUser.userId })
+                });
+                showNotification('Passenger deleted', 'success');
+                loadMasterPassengers();
+            } catch (ignored) {}
         }
 
-        // User Account Section & Bookings History
-        async function loadUserProfileSection() {
-            const container = document.getElementById('user-bookings-container');
+        function openAddMasterPassengerModal() {
+            document.getElementById('modal-add-master').classList.add('open');
+        }
+        function closeAddMasterModal() {
+            document.getElementById('modal-add-master').classList.remove('open');
+        }
+
+        // User Account View & Past Bookings
+        async function loadUserProfileView() {
+            const container = document.getElementById('user-trips-container');
             container.innerHTML = '<p style="text-align: center; padding: 20px;">Loading your booking history...</p>';
 
             try {
@@ -1695,40 +2063,34 @@
                 const bookings = await res.json();
 
                 if (!bookings || bookings.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 30px; background: #f8fafc; border-radius: var(--radius-sm);">You have no previous bookings. Book a ticket from the search tab!</div>';
+                    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 30px; background: #f8fafc; border-radius: var(--radius-sm);">No previous bookings recorded.</div>';
                     return;
                 }
 
                 container.innerHTML = bookings.map(b => `
-                    <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow-sm);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                    <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow-subtle);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <div>
                                 <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">PNR NUMBER</span>
                                 <strong style="font-size: 1.15rem; color: var(--primary); margin-left: 6px; font-family: 'JetBrains Mono', monospace;">${b.pnr}</strong>
                             </div>
-                            <span class="avail-badge ${b.bookingStatus === 'CANCELLED' ? 'avail-red' : 'avail-green'}">${b.bookingStatus}</span>
+                            <span class="status-badge ${b.bookingStatus === 'CANCELLED' ? 'badge-waitlist' : 'badge-available'}">${b.bookingStatus}</span>
                         </div>
-
                         <div style="font-weight: 800; font-size: 1.05rem;">${b.trainNumber} - ${b.trainName}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">${b.fromStationCode} (${b.fromStationName}) ➔ ${b.toStationCode} (${b.toStationName}) • Journey: ${b.journeyDate} • Paid: ₹${b.totalFare}</div>
-
-                        <button type="button" class="btn-coach-map" onclick='renderDigitalTicket(${JSON.stringify(b)})'>
-                            View Official ERS Boarding Pass ➔
-                        </button>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">${b.fromStationCode} ➔ ${b.toStationCode} • Journey: ${b.journeyDate} • Paid: ₹${b.totalFare}</div>
+                        <button type="button" class="btn-action-tool" onclick='displayDigitalTicket(${JSON.stringify(b)})'>View Digital E-Ticket ➔</button>
                     </div>
                 `).join('');
-            } catch (err) {
-                container.innerHTML = '<p style="color: var(--danger); text-align: center;">Failed to load bookings.</p>';
-            }
+            } catch (ignored) {}
         }
 
-        function updateUserHeader() {
-            const btn = document.getElementById('user-display-name');
+        function updateUserNavHeader() {
+            const btn = document.getElementById('user-header-label');
             if (currentUser) {
                 btn.innerText = `👤 ${currentUser.fullName.split(' ')[0]} (${currentUser.username})`;
-                document.getElementById('profile-full-name').innerText = currentUser.fullName;
-                document.getElementById('profile-username').innerText = currentUser.username;
-                document.getElementById('profile-email').innerText = currentUser.email;
+                document.getElementById('account-full-name').innerText = currentUser.fullName;
+                document.getElementById('account-username').innerText = currentUser.username;
+                document.getElementById('account-email').innerText = currentUser.email;
             } else {
                 btn.innerText = '👤 Login / Account';
             }
@@ -1736,19 +2098,19 @@
 
         function openUserModal() {
             if (currentUser) {
-                switchTab('profile');
+                switchNavTab('profile');
             } else {
-                document.getElementById('user-auth-modal').classList.add('open');
+                document.getElementById('modal-auth-login').classList.add('open');
             }
         }
-        function closeUserModal() {
-            document.getElementById('user-auth-modal').classList.remove('open');
+        function closeAuthModal() {
+            document.getElementById('modal-auth-login').classList.remove('open');
         }
 
-        async function handleLogin(e) {
+        async function handleUserSignIn(e) {
             e.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value.trim();
+            const username = document.getElementById('auth-username-in').value.trim();
+            const password = document.getElementById('auth-password-in').value.trim();
 
             try {
                 const res = await fetch('/api/auth/login', {
@@ -1760,20 +2122,20 @@
                 if (!res.ok) throw new Error(data.error || 'Login failed');
 
                 currentUser = data;
-                updateUserHeader();
-                closeUserModal();
-                showToast(`Welcome back, ${data.fullName}!`, 'success');
+                updateUserNavHeader();
+                closeAuthModal();
+                showNotification(`Signed in as ${data.fullName}`, 'success');
                 loadMasterPassengers();
             } catch (err) {
-                showToast(err.message, 'error');
+                showNotification(err.message, 'error');
             }
         }
 
-        function logoutUser() {
+        function logoutSession() {
             currentUser = null;
-            updateUserHeader();
-            showToast('Signed out successfully', 'info');
-            switchTab('search');
+            updateUserNavHeader();
+            showNotification('Signed out', 'info');
+            switchNavTab('search');
         }
     </script>
 </body>

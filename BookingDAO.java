@@ -10,13 +10,21 @@ public class BookingDAO {
         public String gender;
         public String phone;
         public String berthPreference;
+        public String preferredCoach;
+        public Integer preferredSeatNumber;
 
         public PassengerRequest(String name, int age, String gender, String phone, String berthPreference) {
+            this(name, age, gender, phone, berthPreference, null, null);
+        }
+
+        public PassengerRequest(String name, int age, String gender, String phone, String berthPreference, String preferredCoach, Integer preferredSeatNumber) {
             this.name = name;
             this.age = age;
             this.gender = gender;
             this.phone = phone;
             this.berthPreference = berthPreference;
+            this.preferredCoach = preferredCoach;
+            this.preferredSeatNumber = preferredSeatNumber;
         }
     }
 
@@ -178,10 +186,18 @@ public class BookingDAO {
                         int wlNum = 0;
 
                         if (occupiedSeats.size() < cnfCap) {
-                            // Find next free seat matching preference if possible
-                            int assignedSeat = findBestSeat(occupiedSeats, cnfCap, cType, pr.berthPreference);
+                            int assignedSeat;
+                            if (pr.preferredSeatNumber != null && pr.preferredSeatNumber > 0 && pr.preferredSeatNumber <= cnfCap) {
+                                if (occupiedSeats.contains(pr.preferredSeatNumber)) {
+                                    throw new IllegalStateException("Seat #" + pr.preferredSeatNumber + " in coach " + coachPrefix + " is already occupied. Please pick another berth.");
+                                }
+                                assignedSeat = pr.preferredSeatNumber;
+                            } else {
+                                assignedSeat = findBestSeat(occupiedSeats, cnfCap, cType, pr.berthPreference);
+                            }
+
                             occupiedSeats.add(assignedSeat);
-                            coach = coachPrefix;
+                            coach = (pr.preferredCoach != null && !pr.preferredCoach.isBlank()) ? pr.preferredCoach : coachPrefix;
                             seatNum = assignedSeat;
                             berthType = TrainDAO.determineBerthType(cType, assignedSeat);
                             status = "CNF";

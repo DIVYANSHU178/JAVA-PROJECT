@@ -355,6 +355,100 @@ public class TrainDAO {
         return result;
     }
 
+    public static List<Map<String, Object>> searchTrainsByQuery(String query, String date, String quota) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (query == null || query.isBlank()) return list;
+
+        String qClean = query.trim();
+        String quotaClean = (quota == null || quota.isBlank()) ? "GENERAL" : quota.trim().toUpperCase();
+
+        String sql = """
+            SELECT 
+                train_number, train_name, train_type, zone,
+                from_station_code AS board_code, from_station_name AS board_name, departure_time AS board_dep,
+                to_station_code AS dest_code, to_station_name AS dest_name, arrival_time AS dest_arr,
+                1 AS stop_diff,
+                distance_km, duration_h, duration_m,
+                has_1a, has_2a, has_3a, has_sl, has_cc,
+                fare_1a, fare_2a, fare_3a, fare_sl, fare_cc
+            FROM trains
+            WHERE train_number = ? 
+               OR train_number LIKE ? 
+               OR LOWER(train_name) LIKE ?
+            ORDER BY 
+                CASE WHEN train_number = ? THEN 1 WHEN train_number LIKE ? THEN 2 ELSE 3 END,
+                train_number ASC
+            LIMIT 25;
+        """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String numPrefix = qClean + "%";
+            String nameLike = "%" + qClean.toLowerCase() + "%";
+
+            ps.setString(1, qClean);
+            ps.setString(2, numPrefix);
+            ps.setString(3, nameLike);
+            ps.setString(4, qClean);
+            ps.setString(5, numPrefix);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapTrainResult(conn, rs, date, quotaClean));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in searchTrainsByQuery: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public static List<Map<String, Object>> lookupTrains(String query, int limit) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        if (query == null || query.isBlank()) return results;
+
+        String q = query.trim();
+        String sql = """
+            SELECT train_number, train_name, from_station_code, from_station_name, to_station_code, to_station_name, train_type
+            FROM trains
+            WHERE train_number = ? OR train_number LIKE ? OR LOWER(train_name) LIKE ?
+            ORDER BY CASE WHEN train_number = ? THEN 1 WHEN train_number LIKE ? THEN 2 ELSE 3 END, train_name ASC
+            LIMIT ?;
+        """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String numPrefix = q + "%";
+            String namePattern = "%" + q.toLowerCase() + "%";
+
+            ps.setString(1, q);
+            ps.setString(2, numPrefix);
+            ps.setString(3, namePattern);
+            ps.setString(4, q);
+            ps.setString(5, numPrefix);
+            ps.setInt(6, limit > 0 ? limit : 10);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("trainNumber", rs.getString("train_number"));
+                    map.put("trainName", rs.getString("train_name"));
+                    map.put("fromStationCode", rs.getString("from_station_code"));
+                    map.put("fromStationName", rs.getString("from_station_name"));
+                    map.put("toStationCode", rs.getString("to_station_code"));
+                    map.put("toStationName", rs.getString("to_station_name"));
+                    map.put("trainType", rs.getString("train_type"));
+                    results.add(map);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in lookupTrains: " + e.getMessage());
+        }
+        return results;
+    }
+
     public static String determineBerthType(String classType, int seatNumber) {
         if ("CC".equals(classType)) {
             int mod = seatNumber % 5;

@@ -37,6 +37,7 @@ public class ReservationServer {
         // Train & Station Endpoints
         server.createContext("/api/stations/search", new StationSearchHandler());
         server.createContext("/api/trains/search", new TrainSearchHandler());
+        server.createContext("/api/trains/lookup", new TrainLookupHandler());
         server.createContext("/api/trains/availability", new AvailabilityMatrixHandler());
         server.createContext("/api/trains/schedule", new TrainScheduleHandler());
         server.createContext("/api/trains/live-status", new LiveRunningStatusHandler());
@@ -111,7 +112,7 @@ public class ReservationServer {
         }
     }
 
-    // 2. GET /api/trains/search?from=...&to=...&date=...&quota=...
+    // 2. GET /api/trains/search?from=...&to=...&date=...&quota=... OR ?query=...
     private static class TrainSearchHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -122,17 +123,42 @@ public class ReservationServer {
             }
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
+            String query = params.get("query");
+            if (query == null || query.isBlank()) query = params.get("trainNumber");
             String from = params.get("from");
             String to = params.get("to");
             String date = params.get("date");
             String quota = params.getOrDefault("quota", "GENERAL");
 
+            if (query != null && !query.isBlank()) {
+                List<Map<String, Object>> trains = TrainDAO.searchTrainsByQuery(query, date, quota);
+                sendResponse(exchange, 200, JsonUtil.toJson(trains), "application/json; charset=UTF-8");
+                return;
+            }
+
             if (from == null || to == null) {
-                sendResponse(exchange, 400, "{\"error\":\"from and to query parameters are required\"}", "application/json");
+                sendResponse(exchange, 400, "{\"error\":\"from and to, or query parameter is required\"}", "application/json");
                 return;
             }
 
             List<Map<String, Object>> trains = TrainDAO.searchTrains(from, to, date, quota);
+            sendResponse(exchange, 200, JsonUtil.toJson(trains), "application/json; charset=UTF-8");
+        }
+    }
+
+    // 2b. GET /api/trains/lookup?q=...
+    private static class TrainLookupHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 204, "", "application/json");
+                return;
+            }
+
+            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
+            String q = params.getOrDefault("q", "");
+            List<Map<String, Object>> trains = TrainDAO.lookupTrains(q, 10);
             sendResponse(exchange, 200, JsonUtil.toJson(trains), "application/json; charset=UTF-8");
         }
     }
@@ -196,14 +222,15 @@ public class ReservationServer {
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
             String tNum = params.get("trainNumber");
-            String date = params.getOrDefault("date", "");
+            if (tNum == null || tNum.isBlank()) tNum = params.get("q");
+            String dayOffset = params.getOrDefault("dayOffset", "today");
 
-            if (tNum == null) {
-                sendResponse(exchange, 400, "{\"error\":\"trainNumber is required\"}", "application/json");
+            if (tNum == null || tNum.isBlank()) {
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber or q is required\"}", "application/json");
                 return;
             }
 
-            Map<String, Object> status = TrainRunningStatusDAO.getLiveRunningStatus(tNum, date);
+            Map<String, Object> status = TrainRunningStatusDAO.getLiveRunningStatus(tNum, dayOffset);
             sendResponse(exchange, 200, JsonUtil.toJson(status), "application/json; charset=UTF-8");
         }
     }
@@ -332,13 +359,18 @@ public class ReservationServer {
                     int age = JsonUtil.extractInt(obj, "age", 25);
                     String gender = JsonUtil.extractString(obj, "gender");
                     String berth = JsonUtil.extractString(obj, "berthPreference");
+                    int seatNumber = JsonUtil.extractInt(obj, "seatNumber", 0);
+                    String coach = JsonUtil.extractString(obj, "coach");
+
                     if (name != null && !name.isBlank()) {
                         list.add(new BookingDAO.PassengerRequest(
                                 name,
                                 age > 0 ? age : 25,
                                 gender != null ? gender : "Male",
                                 phone != null ? phone : "9876543210",
-                                berth != null ? berth : "No Preference"
+                                berth != null ? berth : "No Preference",
+                                coach,
+                                seatNumber > 0 ? seatNumber : null
                         ));
                     }
                 }

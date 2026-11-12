@@ -3,115 +3,179 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class TrainRunningStatusDAO {
 
-    public static Map<String, Object> getLiveRunningStatus(String trainNumber, String journeyDate) {
+    public static Map<String, Object> getLiveRunningStatus(String trainQuery, String runDay) {
         Map<String, Object> result = new HashMap<>();
-        String tNum = trainNumber != null ? trainNumber.trim().toUpperCase() : "";
-
-        // 1. Get Train info
-        String trainSql = "SELECT train_number, train_name, train_type, from_station_name, to_station_name, departure_time, arrival_time FROM trains WHERE train_number = ?;";
-        String trainName = "Express Train";
-        String fromStation = "Origin";
-        String toStation = "Destination";
-
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(trainSql)) {
-            ps.setString(1, tNum);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    trainName = rs.getString("train_name");
-                    fromStation = rs.getString("from_station_name");
-                    toStation = rs.getString("to_station_name");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error fetching train: " + e.getMessage());
-        }
-
-        result.put("trainNumber", tNum);
-        result.put("trainName", trainName);
-        result.put("fromStation", fromStation);
-        result.put("toStation", toStation);
-        result.put("journeyDate", journeyDate);
-
-        // 2. Fetch all route stops
-        List<Map<String, Object>> stops = getTrainSchedule(tNum);
-        result.put("totalStops", stops.size());
-
-        if (stops.isEmpty()) {
-            result.put("statusMessage", "Schedule not available for this train number.");
-            result.put("stops", stops);
+        if (trainQuery == null || trainQuery.isBlank()) {
+            result.put("error", "Train number or name is required.");
             return result;
         }
 
-        // 3. Simulate Live NTES Position based on current time
+        String qClean = trainQuery.trim();
+
+        // 1. Resolve train from database
+        String trainSql = """
+            SELECT train_number, train_name, train_type, from_station_code, from_station_name, to_station_code, to_station_name, departure_time, arrival_time, duration_h, duration_m, distance_km
+            FROM trains
+            WHERE train_number = ? OR train_number LIKE ? OR LOWER(train_name) LIKE ?
+            ORDER BY CASE WHEN train_number = ? THEN 1 WHEN train_number LIKE ? THEN 2 ELSE 3 END
+            LIMIT 1;
+        """;
+
+        String trainNumber = qClean;
+        String trainName = "Express Train";
+        String fromStation = "Origin";
+        String toStation = "Destination";
+        String originDep = "06:00:00";
+        String destArr = "20:00:00";
+        int totalDist = 800;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(trainSql)) {
+            ps.setString(1, qClean);
+            ps.setString(2, qClean + "%");
+            ps.setString(3, "%" + qClean.toLowerCase() + "%");
+            ps.setString(4, qClean);
+            ps.setString(5, qClean + "%");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    trainNumber = rs.getString("train_number");
+                    trainName = rs.getString("train_name");
+                    fromStation = rs.getString("from_station_name");
+                    toStation = rs.getString("to_station_name");
+                    originDep = rs.getString("departure_time");
+                    destArr = rs.getString("arrival_time");
+                    totalDist = rs.getInt("distance_km");
+                } else {
+                    result.put("error", "No train found matching: " + qClean);
+                    return result;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching train for live status: " + e.getMessage());
+        }
+
+        result.put("trainNumber", trainNumber);
+        result.put("trainName", trainName);
+        result.put("fromStation", fromStation);
+        result.put("toStation", toStation);
+        result.put("scheduledDeparture", originDep);
+        result.put("scheduledArrival", destArr);
+        result.put("totalDistanceKm", totalDist);
+
+        // 2. Fetch all intermediate stops for this train
+        List<Map<String, Object>> stops = getTrainSchedule(trainNumber);
+        result.put("totalStops", stops.size());
+
+        if (stops.isEmpty()) {
+            result.put("error", "No timetable schedule available for train " + trainNumber);
+            return result;
+        }
+
+        // 3. Multi-day timeline calculation
+        int firstDepMins = parseTimeToMinutes((String) stops.get(0).get("departureTime"));
+        int lastArrMins = ((int) stops.get(stops.size() - 1).get("day") - 1) * 1440 + parseTimeToMinutes((String) stops.get(stops.size() - 1).get("arrivalTime"));
+        if (lastArrMins <= firstDepMins) {
+            lastArrMins += 1440;
+        }
+
+        // Current time offset
         LocalTime now = LocalTime.now();
         int nowMinutes = now.getHour() * 60 + now.getMinute();
 
-        int passedCount = 0;
-        int delayMins = (int) ((trainNumber.hashCode() % 15 + 15) % 15); // Deterministic realistic delay 0-14 mins
-        Map<String, Object> currentHalt = null;
-        Map<String, Object> lastPassed = null;
-        Map<String, Object> nextHalt = null;
+        if ("yesterday".equalsIgnoreCase(runDay)) {
+            nowMinutes += 1440;
+        } else if ("tomorrow".equalsIgnoreCase(runDay)) {
+            nowMinutes -= 1440;
+        }
 
+        // If today's train departed earlier or is running on a multi-day schedule
+        if (nowMinutes < firstDepMins && "today".equalsIgnoreCase(runDay) && (firstDepMins - nowMinutes > 360)) {
+            // If checking in the morning for a train that runs in the afternoon/night, keep today.
+            // But if it's already past journey on Day 2, allow user to view today's run.
+        }
+
+        // Delay in minutes (deterministic based on train number)
+        int delayMins = Math.abs(trainNumber.hashCode() % 12);
+        result.put("delayMinutes", delayMins);
+        result.put("delayStatus", delayMins == 0 ? "ON TIME" : "RUNNING LATE BY " + delayMins + " MINS");
+
+        int currentIdx = -1;
+        boolean standingAtHalt = false;
+
+        // Classify every stop as PASSED, CURRENT, or UPCOMING
         for (int i = 0; i < stops.size(); i++) {
             Map<String, Object> s = stops.get(i);
-            String depStr = (String) s.get("departureTime");
-            String arrStr = (String) s.get("arrivalTime");
-            int depMins = parseTimeToMinutes(depStr);
-            int arrMins = parseTimeToMinutes(arrStr);
+            int day = (int) s.get("day");
+            int arrM = (day - 1) * 1440 + parseTimeToMinutes((String) s.get("arrivalTime"));
+            int depM = (day - 1) * 1440 + parseTimeToMinutes((String) s.get("departureTime"));
 
-            if (nowMinutes >= depMins && depMins > 0) {
+            // Add delay
+            arrM += delayMins;
+            depM += delayMins;
+
+            if (nowMinutes > depM) {
                 s.put("state", "PASSED");
-                lastPassed = s;
-                passedCount++;
-            } else if (nowMinutes >= arrMins && nowMinutes < depMins) {
+                currentIdx = i;
+            } else if (nowMinutes >= arrM && nowMinutes <= depM) {
                 s.put("state", "CURRENT");
-                currentHalt = s;
-                break;
+                currentIdx = i;
+                standingAtHalt = true;
             } else {
                 s.put("state", "UPCOMING");
-                if (nextHalt == null) {
-                    nextHalt = s;
-                }
             }
         }
 
-        // If journey ended or not started yet
-        if (passedCount == 0 && nextHalt == null && !stops.isEmpty()) {
-            nextHalt = stops.get(0);
-        } else if (passedCount == stops.size() && !stops.isEmpty()) {
-            lastPassed = stops.get(stops.size() - 1);
-        } else if (nextHalt == null && passedCount < stops.size()) {
-            nextHalt = stops.get(passedCount);
+        // Synthesize headline status
+        if (currentIdx == -1) {
+            // Yet to start from origin
+            stops.get(0).put("state", "CURRENT");
+            for (int i = 1; i < stops.size(); i++) stops.get(i).put("state", "UPCOMING");
+
+            int minsToStart = Math.max(0, firstDepMins - nowMinutes);
+            result.put("currentStatus", "Train yet to depart from origin (" + fromStation + "). Starts in " + formatMins(minsToStart));
+            result.put("speed", "0 km/h");
+            result.put("location", fromStation);
+            result.put("nextStop", stops.size() > 1 ? stops.get(1).get("stationName") : "Destination");
+            result.put("distanceCoveredKm", 0);
+        } else if (currentIdx >= stops.size() - 1 && !standingAtHalt) {
+            // Journey completed
+            for (Map<String, Object> s : stops) s.put("state", "PASSED");
+            stops.get(stops.size() - 1).put("state", "PASSED");
+
+            result.put("currentStatus", "Train has arrived at destination (" + toStation + "). Journey completed.");
+            result.put("speed", "0 km/h");
+            result.put("location", toStation);
+            result.put("nextStop", "Terminated");
+            result.put("distanceCoveredKm", totalDist);
+        } else {
+            Map<String, Object> curStop = stops.get(currentIdx);
+            Map<String, Object> nextStop = (currentIdx + 1 < stops.size()) ? stops.get(currentIdx + 1) : curStop;
+
+            int distCovered = (int) curStop.get("distanceKm");
+            int nextDist = (int) nextStop.get("distanceKm");
+            int remainingKm = Math.max(0, nextDist - distCovered);
+
+            if (standingAtHalt) {
+                curStop.put("state", "CURRENT");
+                result.put("currentStatus", "Standing at " + curStop.get("stationName") + " (PF " + curStop.get("platform") + ")");
+                result.put("speed", "0 km/h");
+                result.put("location", curStop.get("stationName"));
+            } else {
+                result.put("currentStatus", "Departed " + curStop.get("stationName") + " ➔ Next: " + nextStop.get("stationName") + " (" + remainingKm + " km away)");
+                result.put("speed", "108 km/h");
+                result.put("location", "Between " + curStop.get("stationName") + " & " + nextStop.get("stationName"));
+            }
+
+            result.put("nextStop", nextStop.get("stationName"));
+            result.put("distanceCoveredKm", distCovered);
         }
 
         result.put("stops", stops);
-        result.put("delayMinutes", delayMins);
-        result.put("delayStatus", delayMins == 0 ? "RIGHT TIME" : "RUNNING LATE BY " + delayMins + " MINS");
-
-        if (currentHalt != null) {
-            result.put("currentStatus", "Standing at " + currentHalt.get("stationName") + " (PF " + currentHalt.get("platform") + ")");
-            result.put("speed", "0 km/h");
-            result.put("location", currentHalt.get("stationName"));
-        } else if (lastPassed != null && nextHalt != null) {
-            result.put("currentStatus", "Departed " + lastPassed.get("stationName") + " ➔ Next Stop: " + nextHalt.get("stationName"));
-            result.put("speed", "104 km/h");
-            result.put("location", "Between " + lastPassed.get("stationName") + " & " + nextHalt.get("stationName"));
-        } else if (lastPassed != null && nextHalt == null) {
-            result.put("currentStatus", "Train reached destination " + lastPassed.get("stationName"));
-            result.put("speed", "0 km/h");
-            result.put("location", lastPassed.get("stationName"));
-        } else {
-            result.put("currentStatus", "Train yet to depart from origin " + fromStation);
-            result.put("speed", "0 km/h");
-            result.put("location", fromStation);
-        }
-
         return result;
     }
 
@@ -145,18 +209,16 @@ public class TrainRunningStatusDAO {
                     s.put("departureTime", dep);
                     s.put("day", day);
 
-                    // Calculate realistic halt minutes
                     int arrM = parseTimeToMinutes(arr);
                     int depM = parseTimeToMinutes(dep);
                     int halt = (depM >= arrM) ? (depM - arrM) : 2;
                     if (halt == 0 && seq > 1) halt = 2;
                     s.put("haltMinutes", halt);
 
-                    // Platform assignment
                     int pf = (Math.abs((trainNumber + scode).hashCode()) % 5) + 1;
                     s.put("platform", pf);
 
-                    dist += (seq == 1) ? 0 : 45 + (seq * 8 % 60);
+                    dist += (seq == 1) ? 0 : 35 + ((seq * 7) % 45);
                     s.put("distanceKm", dist);
 
                     stops.add(s);
@@ -178,5 +240,10 @@ public class TrainRunningStatusDAO {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    private static String formatMins(int mins) {
+        if (mins < 60) return mins + " mins";
+        return (mins / 60) + "h " + (mins % 60) + "m";
     }
 }
