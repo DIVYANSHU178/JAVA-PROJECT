@@ -3,15 +3,26 @@ import java.util.List;
 import java.util.Optional;
 
 // Responsibility: To orchestrate the application flow, coordinating
-// between the UI and the service layer. Contains the main method.
+// between the UI and the service layer. Launches both Web UI and Console UI.
 public class ReservationApplication {
     private ConsoleUI ui;
     private TicketService ticketService;
+    private ReservationServer webServer;
 
     public ReservationApplication() {
         this.ui = new ConsoleUI();
-        // Initialize with some capacity
-        this.ticketService = new TicketService(75, 125, 175); 
+        // Initialize TicketService singleton with default capacities
+        this.ticketService = TicketService.getInstance();
+    }
+
+    public void startWebServer(int port) {
+        try {
+            webServer = new ReservationServer(port);
+            webServer.start();
+        } catch (IOException e) {
+            System.err.println("⚠️ Notice: Web server could not start on port " + port + ": " + e.getMessage());
+            System.err.println("Continuing in console-only mode.");
+        }
     }
 
     public void run() {
@@ -19,6 +30,10 @@ public class ReservationApplication {
         try {
             do {
                 ui.clearScreen();
+                System.out.println("==================================================================");
+                System.out.println("🚆 RailStay Express — Train Ticket Reservation System");
+                System.out.println("🌐 Modern Web UI Active at: http://localhost:8080");
+                System.out.println("==================================================================");
                 ui.displayHeading();
                 choice = ui.displayMenuAndGetChoice();
 
@@ -40,6 +55,9 @@ public class ReservationApplication {
                         break;
                     case 6:
                         ui.displayExitMessage();
+                        if (webServer != null) {
+                            webServer.stop();
+                        }
                         break;
                     default:
                         ui.displayInvalidChoice();
@@ -68,20 +86,20 @@ public class ReservationApplication {
         if (ticketService.checkAvailability(ticketClass, numTickets)) {
             String name = ui.getPassengerName();
             int age = ui.getPassengerAge();
-            if (age <=0) {
-                 System.out.println("Invalid age.");
-                 return;
+            if (age <= 0) {
+                System.out.println("Invalid age.");
+                return;
             }
             String phone = ui.getPassengerPhoneNumber();
 
             Optional<Passenger> bookedPassenger = ticketService.bookTicket(name, phone, age, ticketClass, numTickets);
-            if(bookedPassenger.isPresent()){
+            if (bookedPassenger.isPresent()) {
                 double price = ticketService.calculatePrice(ticketClass, numTickets);
                 ui.displayBookingSuccess(bookedPassenger.get(), price);
+                System.out.println("PNR Reference: " + bookedPassenger.get().getPnr());
+                System.out.println("Seat Assigned: " + bookedPassenger.get().getSeatAllocationDisplay());
             } else {
-                 // This case should ideally not be reached if checkAvailability was true,
-                 // but good for defensive programming or more complex scenarios.
-                 System.out.println("Booking failed unexpectedly.");
+                System.out.println("Booking failed unexpectedly.");
             }
         } else {
             ui.displayBookingFailureNoAvailability();
@@ -90,19 +108,18 @@ public class ReservationApplication {
 
     private void handleCancelTicket() throws IOException {
         int passengerNum = ui.getPassengerNumberForCancelOrSearch("cancel");
-        if(passengerNum == -1){
+        if (passengerNum == -1) {
             System.out.println("Invalid passenger number format.");
             return;
         }
         Optional<Passenger> passengerOpt = ticketService.findPassengerByNumber(passengerNum);
-        
+
         if (passengerOpt.isPresent()) {
             boolean cancelled = ticketService.cancelTicket(passengerNum);
             if (cancelled) {
                 double refund = ticketService.calculateRefund(passengerOpt.get().getTicketClass());
                 ui.displayCancellationSuccess(refund);
             } else {
-                 // Should not happen if passenger was found, but for safety:
                 ui.displayCancellationFailure();
             }
         } else {
@@ -112,7 +129,7 @@ public class ReservationApplication {
 
     private void handleSearchPassenger() throws IOException {
         int passengerNum = ui.getPassengerNumberForCancelOrSearch("search");
-         if(passengerNum == -1){
+        if (passengerNum == -1) {
             System.out.println("Invalid passenger number format.");
             return;
         }
@@ -137,6 +154,9 @@ public class ReservationApplication {
 
     public static void main(String[] args) {
         ReservationApplication app = new ReservationApplication();
+        // Start web server on background port 8080
+        app.startWebServer(8080);
+        // Start console interaction
         app.run();
     }
 }
