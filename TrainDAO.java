@@ -62,7 +62,10 @@ public class TrainDAO {
                     AND s1.stop_sequence < s2.stop_sequence
                 JOIN trains t 
                     ON t.train_number = s1.train_number
-                WHERE s1.station_code = ANY (?) AND s2.station_code = ANY (?)
+                WHERE s1.station_code = ANY (?) 
+                  AND s2.station_code = ANY (?)
+                  AND s1.is_halt = TRUE 
+                  AND s2.is_halt = TRUE
                 ORDER BY s1.departure_time ASC
                 LIMIT 60;
             """;

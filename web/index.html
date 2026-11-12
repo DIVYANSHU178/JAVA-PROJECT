@@ -428,7 +428,7 @@
             <div class="header-actions">
                 <div class="pill-badge">
                     <span class="radar-dot"></span>
-                    <span id="header-db-status">PostgreSQL 18 Live (8,990 Stations • 13,200+ Trains • 472,600+ Halts)</span>
+                    <span id="header-db-status">PostgreSQL 18 Live (8,990 Stations • 13,500+ Trains • 165,000+ Commercial Halts)</span>
                 </div>
                 <button type="button" class="btn-account-pill" onclick="openUserModal()">
                     <span id="user-header-label">👤 Login / Account</span>
@@ -475,7 +475,7 @@
                 <div class="search-hero-top">
                     <div class="search-title">
                         <h2>Indian Railway Reservation Portal</h2>
-                        <p>Search over 13,200+ Passenger Trains, 8,990 Stations & 472,600+ Intermediate Halts</p>
+                        <p>Search over 13,500+ Passenger Trains, 8,990 Stations & 165,000+ Scheduled Halts</p>
                     </div>
 
                     <!-- Dual Mode Switcher -->
@@ -1254,15 +1254,22 @@
                 }
 
                 const isDelayed = data.delayMinutes > 0;
-                const timelineHtml = (data.stops || []).map((s, idx) => `
+                const timelineHtml = (data.stops || []).map((s, idx) => {
+                    const isOrigin = idx === 0;
+                    const isDest = idx === (data.stops.length - 1);
+                    const haltLabel = isOrigin ? `🟢 Origin Station • Departs: <strong>${s.departureTime}</strong> • Platform ${s.platform}` :
+                                      isDest ? `🏁 Terminating Destination • Arrives: <strong>${s.arrivalTime}</strong> • Platform ${s.platform}` :
+                                      `Platform ${s.platform} • Arr: <strong>${s.arrivalTime}</strong> • Dep: <strong>${s.departureTime}</strong> • Halt: <strong>${s.haltMinutes > 0 ? s.haltMinutes + ' min' : '1 min'}</strong> • ${s.distanceKm} km`;
+                    return `
                     <div class="live-station-node ${s.state === 'PASSED' ? 'passed' : s.state === 'CURRENT' ? 'current' : ''}">
                         <div class="station-bullet-dot">${s.state === 'PASSED' ? '✓' : idx + 1}</div>
                         <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${s.stationName} (${s.stationCode})</div>
                         <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">
-                            Platform ${s.platform} • Arr: <strong>${s.arrivalTime}</strong> • Dep: <strong>${s.departureTime}</strong> • Halt: ${s.haltMinutes} min • ${s.distanceKm} km
+                            ${haltLabel}
                         </div>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
 
                 view.innerHTML = `
                     <div class="live-status-hero">
@@ -1290,6 +1297,15 @@
                                 <div style="font-size: 1.05rem; font-weight: 800;">${data.nextStop}</div>
                             </div>
                         </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 4px 14px 4px; border-bottom: 1px solid var(--border-light); margin-bottom: 12px;">
+                        <span style="font-weight: 700; color: var(--primary); font-size: 0.92rem;">
+                            📍 Official Timetable: ${data.stops.length} Scheduled Commercial Halts
+                        </span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); background: #f1f5f9; padding: 4px 10px; border-radius: 12px;">
+                            Pass-through track waypoints filtered
+                        </span>
                     </div>
 
                     <div style="padding: 10px 0;">
@@ -1494,6 +1510,9 @@
 
                 body.innerHTML = `
                     <div style="overflow-x: auto;">
+                        <div style="background: #f8fafc; padding: 10px 14px; font-size: 0.84rem; color: var(--primary); font-weight: 700; border-bottom: 1px solid var(--border);">
+                            📍 Official Commercial Halts (${stops.length} Scheduled Stations • Non-stopping waypoints filtered)
+                        </div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
                             <thead>
                                 <tr style="background: #f1f5f9; text-align: left; text-transform: uppercase; font-size: 0.78rem;">
@@ -1508,14 +1527,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${stops.map(s => `
-                                    <tr style="border-bottom: 1px solid var(--border);">
-                                        <td style="padding: 8px 10px;">${s.sequence}</td>
+                                ${stops.map((s, idx) => `
+                                    <tr style="border-bottom: 1px solid var(--border); ${idx === 0 || idx === stops.length - 1 ? 'background: #f8fafc; font-weight: 700;' : ''}">
+                                        <td style="padding: 8px 10px;">${idx + 1}</td>
                                         <td style="padding: 8px 10px;"><strong>${s.stationName}</strong></td>
                                         <td style="padding: 8px 10px;"><span class="station-code-chip">${s.stationCode}</span></td>
-                                        <td style="padding: 8px 10px;">${s.arrivalTime}</td>
-                                        <td style="padding: 8px 10px;">${s.departureTime}</td>
-                                        <td style="padding: 8px 10px;">${s.haltMinutes} min</td>
+                                        <td style="padding: 8px 10px;">${idx === 0 ? 'Starts' : s.arrivalTime}</td>
+                                        <td style="padding: 8px 10px;">${idx === stops.length - 1 ? 'Terminates' : s.departureTime}</td>
+                                        <td style="padding: 8px 10px;">${idx === 0 || idx === stops.length - 1 ? '--' : (s.haltMinutes > 0 ? s.haltMinutes + ' min' : '2 min')}</td>
                                         <td style="padding: 8px 10px;">PF ${s.platform}</td>
                                         <td style="padding: 8px 10px;">${s.distanceKm} km</td>
                                     </tr>

@@ -180,13 +180,25 @@ public class TrainRunningStatusDAO {
     }
 
     public static List<Map<String, Object>> getTrainSchedule(String trainNumber) {
+        return getTrainSchedule(trainNumber, false);
+    }
+
+    public static List<Map<String, Object>> getTrainSchedule(String trainNumber, boolean includeWaypoints) {
         List<Map<String, Object>> stops = new ArrayList<>();
-        String sql = """
-            SELECT station_code, station_name, arrival_time, departure_time, stop_day, stop_sequence
+        String sqlWithHalts = """
+            SELECT station_code, station_name, arrival_time, departure_time, stop_day, stop_sequence, is_halt
+            FROM train_route_stops
+            WHERE train_number = ? AND is_halt = TRUE
+            ORDER BY stop_sequence ASC;
+        """;
+        String sqlAll = """
+            SELECT station_code, station_name, arrival_time, departure_time, stop_day, stop_sequence, is_halt
             FROM train_route_stops
             WHERE train_number = ?
             ORDER BY stop_sequence ASC;
         """;
+
+        String sql = includeWaypoints ? sqlAll : sqlWithHalts;
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -201,6 +213,7 @@ public class TrainRunningStatusDAO {
                     String dep = rs.getString("departure_time");
                     int day = rs.getInt("stop_day");
                     int seq = rs.getInt("stop_sequence");
+                    boolean isHalt = rs.getBoolean("is_halt");
 
                     s.put("sequence", seq);
                     s.put("stationCode", scode);
@@ -208,11 +221,11 @@ public class TrainRunningStatusDAO {
                     s.put("arrivalTime", arr);
                     s.put("departureTime", dep);
                     s.put("day", day);
+                    s.put("isHalt", isHalt);
 
                     int arrM = parseTimeToMinutes(arr);
                     int depM = parseTimeToMinutes(dep);
-                    int halt = (depM >= arrM) ? (depM - arrM) : 2;
-                    if (halt == 0 && seq > 1) halt = 2;
+                    int halt = (depM > arrM) ? (depM - arrM) : 0;
                     s.put("haltMinutes", halt);
 
                     int pf = (Math.abs((trainNumber + scode).hashCode()) % 5) + 1;
@@ -223,6 +236,11 @@ public class TrainRunningStatusDAO {
 
                     stops.add(s);
                 }
+            }
+
+            // Fallback to all stops if train has no rows marked is_halt = TRUE
+            if (stops.isEmpty() && !includeWaypoints) {
+                return getTrainSchedule(trainNumber, true);
             }
         } catch (SQLException e) {
             System.err.println("Error in getTrainSchedule: " + e.getMessage());

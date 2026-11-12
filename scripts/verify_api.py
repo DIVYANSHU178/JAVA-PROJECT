@@ -77,6 +77,19 @@ print(f"   Second Booking Attempt for C1-12: HTTP {status2}, Error: {res2.get('e
 assert status2 == 409, "Double booking was not blocked!"
 print("   🔒 ACID Lock Confirmed: Second booking for same seat was correctly REJECTED with HTTP 409!")
 
+print("\n7. Testing Commercial Halts Filtering (Bhopal Shatabdi #12002):")
+sh = get("/trains/schedule?trainNumber=12002")
+print(f"   Official Scheduled Halts returned: {len(sh)} (Previously 87 unhalted waypoints)")
+assert len(sh) == 7, f"Expected 7 halts for 12002, got {len(sh)}"
+print(f"   Stops: {', '.join([s['stationCode'] for s in sh])}")
+print("   ✅ Verified: Only official stopping stations (NDLS, MTJ, AGC, MRA, GWL, JHS, BPL) returned!")
+
+print("\n8. Testing Expanded Modern Superfast Fleet (Bengaluru Rajdhani #22691):")
+raj = get("/trains/search?q=22691")
+print(f"   Found {len(raj)} trains: #{raj[0].get('trainNumber')} - {raj[0].get('trainName')}")
+assert raj[0].get('trainNumber') == '22691', "22691 was not found!"
+print("   ✅ Verified: Modern 2xxxx fleet is actively searchable!")
+
 print("\n==================================================================")
 print("🚀 ALL END-TO-END TESTS PASSED WITH 100% SUCCESS!")
 print("==================================================================")
