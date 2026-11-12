@@ -8,40 +8,46 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// Responsibility: High-performance, lightweight embedded HTTP Web Server for RailStay.
+// High-performance, lightweight embedded HTTP Web Server for RailStay IRCTC Engine.
 public class ReservationServer {
 
     private final int port;
     private HttpServer server;
-    private final TicketService ticketService;
 
     public ReservationServer(int port) {
         this.port = port;
-        this.ticketService = TicketService.getInstance();
     }
 
     public void start() throws IOException {
         server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.setExecutor(Executors.newVirtualThreadPerTaskExecutor()); // Java 21+ virtual threads for high concurrency
+        server.setExecutor(Executors.newVirtualThreadPerTaskExecutor()); // Java 21+ virtual threads
 
-        // Contexts
+        // Static Web UI
         server.createContext("/", new StaticFileHandler());
-        server.createContext("/api/trains", new TrainsApiHandler());
-        server.createContext("/api/book", new BookingApiHandler());
-        server.createContext("/api/pnr", new PnrApiHandler());
-        server.createContext("/api/cancel", new CancelApiHandler());
-        server.createContext("/api/chart", new ChartApiHandler());
-        server.createContext("/api/stats", new StatsApiHandler());
+
+        // Real IRCTC API Endpoints
+        server.createContext("/api/stations/search", new StationSearchHandler());
+        server.createContext("/api/trains/search", new TrainSearchHandler());
+        server.createContext("/api/trains/availability", new AvailabilityMatrixHandler());
+        server.createContext("/api/coach/layout", new CoachLayoutHandler());
+        server.createContext("/api/book", new BookingHandler());
+        server.createContext("/api/pnr", new PnrStatusHandler());
+        server.createContext("/api/cancel", new CancelTicketHandler());
+        server.createContext("/api/stats", new StatsHandler());
 
         server.start();
         System.out.println("==================================================================");
-        System.out.println("🚆 RailStay Express Train Reservation Web Server is running!");
-        System.out.println("🌐 Access Web Site UI at: http://localhost:" + port);
+        System.out.println("🚆 RailStay IRCTC-Grade Railway Reservation Engine Running!");
+        System.out.println("🌐 Access Web Interface: http://localhost:" + port);
+        System.out.println("🗄️ Database: PostgreSQL (railstay_db on port 7777)");
         System.out.println("==================================================================");
     }
 
@@ -70,8 +76,8 @@ public class ReservationServer {
         }
     }
 
-    // GET /api/trains
-    private class TrainsApiHandler implements HttpHandler {
+    // 1. GET /api/stations/search?q=...
+    private static class StationSearchHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             addCorsHeaders(exchange);
@@ -80,27 +86,97 @@ public class ReservationServer {
                 return;
             }
 
-            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}", "application/json");
-                return;
-            }
+            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
+            String q = params.getOrDefault("q", "");
+            int limit = 15;
+            try {
+                if (params.containsKey("limit")) limit = Integer.parseInt(params.get("limit"));
+            } catch (NumberFormatException ignored) {}
 
-            Collection<Train> trains = ticketService.getAllTrains();
-            StringBuilder sb = new StringBuilder("[");
-            boolean first = true;
-            for (Train t : trains) {
-                if (!first) sb.append(",");
-                sb.append(JsonUtil.trainToJson(t));
-                first = false;
-            }
-            sb.append("]");
-
-            sendResponse(exchange, 200, sb.toString(), "application/json; charset=UTF-8");
+            List<Map<String, Object>> stations = StationDAO.searchStations(q, limit);
+            sendResponse(exchange, 200, JsonUtil.toJson(stations), "application/json; charset=UTF-8");
         }
     }
 
-    // POST /api/book
-    private class BookingApiHandler implements HttpHandler {
+    // 2. GET /api/trains/search?from=...&to=...&date=...&quota=...
+    private static class TrainSearchHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 204, "", "application/json");
+                return;
+            }
+
+            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
+            String from = params.get("from");
+            String to = params.get("to");
+            String date = params.get("date");
+            String quota = params.getOrDefault("quota", "GENERAL");
+
+            if (from == null || to == null) {
+                sendResponse(exchange, 400, "{\"error\":\"from and to query parameters are required\"}", "application/json");
+                return;
+            }
+
+            List<Map<String, Object>> trains = TrainDAO.searchTrains(from, to, date, quota);
+            sendResponse(exchange, 200, JsonUtil.toJson(trains), "application/json; charset=UTF-8");
+        }
+    }
+
+    // 3. GET /api/trains/availability?trainNumber=...&classType=...&date=...
+    private static class AvailabilityMatrixHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 204, "", "application/json");
+                return;
+            }
+
+            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
+            String tNum = params.get("trainNumber");
+            String cType = params.getOrDefault("classType", "3A");
+            String date = params.get("date");
+
+            if (tNum == null) {
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber parameter required\"}", "application/json");
+                return;
+            }
+
+            List<Map<String, Object>> matrix = TrainDAO.getAvailabilityMatrix(tNum, cType, date);
+            sendResponse(exchange, 200, JsonUtil.toJson(matrix), "application/json; charset=UTF-8");
+        }
+    }
+
+    // 4. GET /api/coach/layout?trainNumber=...&classType=...&coach=...&date=...
+    private static class CoachLayoutHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 204, "", "application/json");
+                return;
+            }
+
+            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
+            String tNum = params.get("trainNumber");
+            String cType = params.getOrDefault("classType", "3A");
+            String coach = params.get("coach");
+            String date = params.get("date");
+
+            if (tNum == null || date == null) {
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber and date parameters required\"}", "application/json");
+                return;
+            }
+
+            Map<String, Object> layout = TrainDAO.getCoachLayout(tNum, cType, coach, date);
+            sendResponse(exchange, 200, JsonUtil.toJson(layout), "application/json; charset=UTF-8");
+        }
+    }
+
+    // 5. POST /api/book
+    private static class BookingHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             addCorsHeaders(exchange);
@@ -114,22 +190,28 @@ public class ReservationServer {
                 return;
             }
 
-            String requestBody = readRequestBody(exchange);
+            String body = readRequestBody(exchange);
             try {
-                String trainNumber = JsonUtil.extractString(requestBody, "trainNumber");
-                String journeyDate = JsonUtil.extractString(requestBody, "journeyDate");
-                int ticketClass = JsonUtil.extractInt(requestBody, "ticketClass", 2);
+                String trainNumber = JsonUtil.extractString(body, "trainNumber");
+                String journeyDate = JsonUtil.extractString(body, "journeyDate");
+                String classType = JsonUtil.extractString(body, "classType");
+                String quota = JsonUtil.extractString(body, "quota");
+                String fromCode = JsonUtil.extractString(body, "fromStationCode");
+                String toCode = JsonUtil.extractString(body, "toStationCode");
 
-                // Parse passengers list
-                List<TicketService.PassengerInput> passengers = parsePassengers(requestBody);
+                if (trainNumber == null || journeyDate == null) {
+                    sendResponse(exchange, 400, "{\"error\":\"Missing required booking parameters\"}", "application/json");
+                    return;
+                }
+
+                List<BookingDAO.PassengerRequest> passengers = parsePassengers(body);
                 if (passengers.isEmpty()) {
                     sendResponse(exchange, 400, "{\"error\":\"At least one passenger is required\"}", "application/json");
                     return;
                 }
 
-                Ticket ticket = ticketService.bookTicketAdvanced(trainNumber, journeyDate, ticketClass, passengers);
-                String responseJson = JsonUtil.ticketToJson(ticket);
-                sendResponse(exchange, 201, responseJson, "application/json; charset=UTF-8");
+                Map<String, Object> booking = BookingDAO.bookTicket(trainNumber, journeyDate, classType, quota, fromCode, toCode, passengers);
+                sendResponse(exchange, 201, JsonUtil.toJson(booking), "application/json; charset=UTF-8");
 
             } catch (IllegalStateException e) {
                 sendResponse(exchange, 409, "{\"error\":\"" + JsonUtil.escape(e.getMessage()) + "\"}", "application/json");
@@ -138,13 +220,12 @@ public class ReservationServer {
             }
         }
 
-        private List<TicketService.PassengerInput> parsePassengers(String json) {
-            List<TicketService.PassengerInput> list = new ArrayList<>();
+        private List<BookingDAO.PassengerRequest> parsePassengers(String json) {
+            List<BookingDAO.PassengerRequest> list = new ArrayList<>();
             Pattern pArrayPattern = Pattern.compile("\"passengers\"\\s*:\\s*\\[([^\\]]+)\\]", Pattern.DOTALL);
             Matcher m = pArrayPattern.matcher(json);
             if (m.find()) {
                 String arrayContent = m.group(1);
-                // Split objects roughly by "}"
                 String[] objects = arrayContent.split("\\},");
                 for (String obj : objects) {
                     String name = JsonUtil.extractString(obj, "name");
@@ -153,12 +234,12 @@ public class ReservationServer {
                     String gender = JsonUtil.extractString(obj, "gender");
                     String berth = JsonUtil.extractString(obj, "berthPreference");
                     if (name != null && !name.isBlank()) {
-                        list.add(new TicketService.PassengerInput(
+                        list.add(new BookingDAO.PassengerRequest(
                                 name,
-                                phone != null ? phone : "",
                                 age > 0 ? age : 25,
                                 gender != null ? gender : "Male",
-                                berth != null ? berth : "Lower"
+                                phone != null ? phone : "9876543210",
+                                berth != null ? berth : "No Preference"
                         ));
                     }
                 }
@@ -167,43 +248,34 @@ public class ReservationServer {
         }
     }
 
-    // GET /api/pnr?pnr=...
-    private class PnrApiHandler implements HttpHandler {
+    // 6. GET /api/pnr?pnr=...
+    private static class PnrStatusHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             addCorsHeaders(exchange);
-            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}", "application/json");
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 204, "", "application/json");
                 return;
             }
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
             String pnr = params.get("pnr");
-
             if (pnr == null || pnr.isBlank()) {
-                sendResponse(exchange, 400, "{\"error\":\"PNR query parameter is required\"}", "application/json");
+                sendResponse(exchange, 400, "{\"error\":\"PNR parameter is required\"}", "application/json");
                 return;
             }
 
-            Ticket ticket = ticketService.findTicketByPnr(pnr);
-            if (ticket == null) {
-                // Also search by phone or name
-                List<Ticket> matches = ticketService.searchTickets(pnr);
-                if (!matches.isEmpty()) {
-                    ticket = matches.get(0);
-                }
-            }
-
-            if (ticket != null) {
-                sendResponse(exchange, 200, JsonUtil.ticketToJson(ticket), "application/json; charset=UTF-8");
+            Map<String, Object> res = BookingDAO.getPnrStatus(pnr);
+            if (res != null) {
+                sendResponse(exchange, 200, JsonUtil.toJson(res), "application/json; charset=UTF-8");
             } else {
-                sendResponse(exchange, 404, "{\"error\":\"No booking found for PNR or Query: " + JsonUtil.escape(pnr) + "\"}", "application/json");
+                sendResponse(exchange, 404, "{\"error\":\"PNR " + JsonUtil.escape(pnr) + " not found or expired.\"}", "application/json");
             }
         }
     }
 
-    // POST /api/cancel
-    private class CancelApiHandler implements HttpHandler {
+    // 7. POST /api/cancel
+    private static class CancelTicketHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             addCorsHeaders(exchange);
@@ -225,8 +297,8 @@ public class ReservationServer {
             }
 
             try {
-                Ticket cancelledTicket = ticketService.cancelTicketByPnr(pnr);
-                sendResponse(exchange, 200, JsonUtil.ticketToJson(cancelledTicket), "application/json; charset=UTF-8");
+                Map<String, Object> result = BookingDAO.cancelTicket(pnr);
+                sendResponse(exchange, 200, JsonUtil.toJson(result), "application/json; charset=UTF-8");
             } catch (NoSuchElementException e) {
                 sendResponse(exchange, 404, "{\"error\":\"" + JsonUtil.escape(e.getMessage()) + "\"}", "application/json");
             } catch (IllegalStateException e) {
@@ -237,43 +309,39 @@ public class ReservationServer {
         }
     }
 
-    // GET /api/chart?trainNumber=...&journeyDate=...
-    private class ChartApiHandler implements HttpHandler {
+    // 8. GET /api/stats
+    private static class StatsHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             addCorsHeaders(exchange);
-            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}", "application/json");
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 204, "", "application/json");
                 return;
             }
 
-            Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-            String trainNumber = params.get("trainNumber");
-            String journeyDate = params.get("journeyDate");
+            Map<String, Object> stats = new HashMap<>();
+            try (Connection conn = DatabaseConfig.getConnection();
+                 Statement st = conn.createStatement()) {
 
-            List<Passenger> chart = ticketService.getReservationChart(trainNumber, journeyDate);
-            StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < chart.size(); i++) {
-                if (i > 0) sb.append(",");
-                sb.append(JsonUtil.passengerToJson(chart.get(i)));
-            }
-            sb.append("]");
-
-            sendResponse(exchange, 200, sb.toString(), "application/json; charset=UTF-8");
-        }
-    }
-
-    // GET /api/stats
-    private class StatsApiHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            addCorsHeaders(exchange);
-            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}", "application/json");
-                return;
+                try (ResultSet rs = st.executeQuery("SELECT count(*) FROM stations;")) {
+                    if (rs.next()) stats.put("totalStations", rs.getInt(1));
+                }
+                try (ResultSet rs = st.executeQuery("SELECT count(*) FROM trains;")) {
+                    if (rs.next()) stats.put("totalTrains", rs.getInt(1));
+                }
+                try (ResultSet rs = st.executeQuery("SELECT count(*) FROM train_route_stops;")) {
+                    if (rs.next()) stats.put("totalRouteStops", rs.getInt(1));
+                }
+                try (ResultSet rs = st.executeQuery("SELECT count(*) FROM bookings;")) {
+                    if (rs.next()) stats.put("totalBookings", rs.getInt(1));
+                }
+                try (ResultSet rs = st.executeQuery("SELECT count(*) FROM booking_passengers WHERE current_status = 'CNF';")) {
+                    if (rs.next()) stats.put("confirmedPassengers", rs.getInt(1));
+                }
+            } catch (Exception e) {
+                stats.put("error", e.getMessage());
             }
 
-            Map<String, Object> stats = ticketService.getSystemStats();
             sendResponse(exchange, 200, JsonUtil.toJson(stats), "application/json; charset=UTF-8");
         }
     }
