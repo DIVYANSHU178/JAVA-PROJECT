@@ -468,6 +468,20 @@
 
     <!-- Main Content Work Area -->
     <main>
+        <!-- Database Health / Missing Setup Warning Banner -->
+        <div id="db-setup-alert" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; border-left: 6px solid #e11d48; padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 20px; color: #9f1239;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <span style="font-size: 1.5rem;">⚠️</span>
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 4px;">PostgreSQL Database Not Detected on this PC</h3>
+                    <p id="db-setup-msg" style="font-size: 0.86rem; color: #475569; margin-bottom: 8px;">The system could not connect to PostgreSQL on port 7777 or 5432 for database <code>railstay_db</code>.</p>
+                    <div style="font-size: 0.84rem; background: #ffffff; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid #fed7aa; display: inline-block;">
+                        👉 <strong>1-Click Solution:</strong> Double-click <strong style="color: #ea580c;">setup_database.bat</strong> in the project folder to automatically create the database and import all 14,346 trains and 8,990 stations!
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- TAB 1: TRAIN SEARCH & BOOKING -->
         <section id="view-tab-search" class="workspace-view active">
             <!-- Hero Search Card with Dual Search Modes -->
@@ -897,11 +911,43 @@
         document.addEventListener('DOMContentLoaded', () => {
             initClock();
             initDefaultDate();
+            checkDatabaseHealth();
             loadMasterPassengers();
             checkTatkalAvailability();
             updateUserNavHeader();
             executeSearch(); // Load initial trains
         });
+
+        async function checkDatabaseHealth() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const badge = document.getElementById('header-db-status');
+                const alertBox = document.getElementById('db-setup-alert');
+
+                if (data.totalTrains > 0) {
+                    badge.innerText = `PostgreSQL Live (${data.totalTrains.toLocaleString()} Trains • ${data.totalStations.toLocaleString()} Stations)`;
+                    if (alertBox) alertBox.style.display = 'none';
+                } else {
+                    badge.innerText = '⚠️ Database Disconnected';
+                    badge.parentElement.style.background = '#fef2f2';
+                    badge.parentElement.style.color = '#991b1b';
+                    if (alertBox) {
+                        alertBox.style.display = 'block';
+                        if (data.error) {
+                            document.getElementById('db-setup-msg').innerText = data.error;
+                        }
+                    }
+                }
+            } catch (err) {
+                const badge = document.getElementById('header-db-status');
+                badge.innerText = '⚠️ Database Disconnected';
+                badge.parentElement.style.background = '#fef2f2';
+                badge.parentElement.style.color = '#991b1b';
+                const alertBox = document.getElementById('db-setup-alert');
+                if (alertBox) alertBox.style.display = 'block';
+            }
+        }
 
         function initClock() {
             setInterval(() => {

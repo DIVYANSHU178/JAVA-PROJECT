@@ -2,4 +2,7 @@
 *.log
 .DS_Store
 Thumbs.db
-data/
+data/*.json
+data/populate_*.sql
+data/expand_*.sql
+!data/railstay_full_backup.sql
