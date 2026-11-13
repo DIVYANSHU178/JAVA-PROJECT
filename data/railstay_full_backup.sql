@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict azpeXa8Cjwaw2z4eN4nOd9COaUuayvXI6eiQjWi66gh0unUvwLJe0OglVqmVmGx
+\restrict GYOor8HJ3TnG9nbLhZbAE4M4FCCkAedjmWHNB5in0LVmvnioXek8GVr2NrhKWdv
 
 -- Dumped from database version 18.6
 -- Dumped by pg_dump version 18.6
@@ -481,6 +481,9 @@ COPY public.city_station_clusters (cluster_id, city_name, station_code, station_
 COPY public.master_passengers (id, user_id, passenger_name, age, gender, berth_preference, id_card_type, id_card_number, created_at) FROM stdin;
 1	1	Divyanshu Sharma	24	Male	Lower	Aadhaar Card	XXXX-XXXX-4512	2026-11-12 16:49:57.234727+05:30
 2	1	Priya Sharma	22	Female	Middle	Voter ID	VTR8892102	2026-11-12 16:49:57.234727+05:30
+3	2	Mansi Verma	23	Female	Lower	Aadhaar Card	XXXX-XXXX-9821	2026-11-13 13:14:25.446126+05:30
+4	2	Neha Verma	21	Female	Side Lower	Voter ID	VTR9023412	2026-11-13 13:14:25.446126+05:30
+5	2	Rahul Verma	26	Male	Upper	Driving License	DL-0420220912	2026-11-13 13:14:25.446126+05:30
 \.
 
 
@@ -503546,6 +503549,7 @@ R18235-SL	Bilaspur Express Passenger Slip (Return)	Pass	SECR	CHRM	Chirmiri	BPL	B
 
 COPY public.users (user_id, username, password_hash, full_name, email, phone, created_at) FROM stdin;
 1	demo_user	password123	Divyanshu Sharma	divyanshu@example.com	9876543210	2026-11-12 16:49:57.234727+05:30
+2	mansi	ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f	Mansi Verma	mansi@example.com	9876543211	2026-11-13 13:14:25.446126+05:30
 \.
 
 
@@ -503574,7 +503578,7 @@ SELECT pg_catalog.setval('public.city_station_clusters_cluster_id_seq', 42, true
 -- Name: master_passengers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.master_passengers_id_seq', 2, true);
+SELECT pg_catalog.setval('public.master_passengers_id_seq', 5, true);
 
 
 --
@@ -503588,7 +503592,7 @@ SELECT pg_catalog.setval('public.train_route_stops_id_seq', 539274, true);
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 2, true);
 
 
 --
@@ -503842,5 +503846,5 @@ ALTER TABLE ONLY public.train_route_stops
 -- PostgreSQL database dump complete
 --
 
-\unrestrict azpeXa8Cjwaw2z4eN4nOd9COaUuayvXI6eiQjWi66gh0unUvwLJe0OglVqmVmGx
+\unrestrict GYOor8HJ3TnG9nbLhZbAE4M4FCCkAedjmWHNB5in0LVmvnioXek8GVr2NrhKWdv
 
