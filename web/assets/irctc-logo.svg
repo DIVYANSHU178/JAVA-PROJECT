@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
+  <defs>
+    <linearGradient id="irctcBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d3557" />
+      <stop offset="100%" stop-color="#0b2545" />
+    </linearGradient>
+    <linearGradient id="irctcOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb8500" />
+      <stop offset="100%" stop-color="#d90429" />
+    </linearGradient>
+  </defs>
+  <!-- Stylized Emblem -->
+  <g transform="translate(10, 5)">
+    <circle cx="25" cy="25" r="23" fill="none" stroke="url(#irctcBlue)" stroke-width="3"/>
+    <path d="M 12 25 C 12 15, 38 15, 38 25 C 38 35, 12 35, 12 25 Z" fill="none" stroke="url(#irctcOrange)" stroke-width="3.5" />
+    <circle cx="25" cy="25" r="6" fill="#1d3557"/>
+    <path d="M 25 8 L 25 15 M 25 35 L 25 42 M 8 25 L 15 25 M 35 25 L 42 25" stroke="#fb8500" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Typography -->
+  <text x="68" y="34" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="900" font-size="28" fill="#1d3557" letter-spacing="1.5">IRCTC</text>
+  <text x="68" y="47" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="600" font-size="8.5" fill="#e63946" letter-spacing="0.5">Indian Railway Catering &amp; Tourism Corp.</text>
+</svg>

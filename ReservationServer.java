@@ -72,7 +72,7 @@ public class ReservationServer {
         }
     }
 
-    // Static Web UI Handler
+    // Static Web UI & Asset Handler
     private static class StaticFileHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -85,9 +85,32 @@ public class ReservationServer {
             if ("/".equals(path) || "/index.html".equals(path)) {
                 String html = WebUI.getHtmlContent();
                 sendResponse(exchange, 200, html, "text/html; charset=UTF-8");
-            } else {
-                sendResponse(exchange, 404, "Page Not Found", "text/plain");
+                return;
             }
+
+            // Check if file exists in web directory
+            java.nio.file.Path filePath = java.nio.file.Paths.get("web", path.startsWith("/") ? path.substring(1) : path);
+            if (java.nio.file.Files.exists(filePath) && !java.nio.file.Files.isDirectory(filePath)) {
+                String contentType = java.nio.file.Files.probeContentType(filePath);
+                if (contentType == null) {
+                    if (path.endsWith(".svg")) contentType = "image/svg+xml";
+                    else if (path.endsWith(".css")) contentType = "text/css; charset=UTF-8";
+                    else if (path.endsWith(".js")) contentType = "application/javascript; charset=UTF-8";
+                    else if (path.endsWith(".png")) contentType = "image/png";
+                    else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) contentType = "image/jpeg";
+                    else if (path.endsWith(".webp")) contentType = "image/webp";
+                    else contentType = "application/octet-stream";
+                }
+                byte[] bytes = java.nio.file.Files.readAllBytes(filePath);
+                exchange.getResponseHeaders().set("Content-Type", contentType);
+                exchange.sendResponseHeaders(200, bytes.length);
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(bytes);
+                }
+                return;
+            }
+
+            sendResponse(exchange, 404, "Page Not Found", "text/plain");
         }
     }
 
@@ -176,12 +199,12 @@ public class ReservationServer {
             }
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-            String tNum = params.get("trainNumber");
-            String cType = params.getOrDefault("classType", "3A");
-            String date = params.get("date");
+            String tNum = params.getOrDefault("trainNumber", params.get("train"));
+            String cType = params.getOrDefault("classType", params.getOrDefault("class", "3A"));
+            String date = params.getOrDefault("date", java.time.LocalDate.now().toString());
 
-            if (tNum == null) {
-                sendResponse(exchange, 400, "{\"error\":\"trainNumber parameter required\"}", "application/json");
+            if (tNum == null || tNum.isBlank()) {
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber or train parameter required\"}", "application/json");
                 return;
             }
 
@@ -201,9 +224,9 @@ public class ReservationServer {
             }
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-            String tNum = params.get("trainNumber");
-            if (tNum == null) {
-                sendResponse(exchange, 400, "{\"error\":\"trainNumber is required\"}", "application/json");
+            String tNum = params.getOrDefault("trainNumber", params.get("train"));
+            if (tNum == null || tNum.isBlank()) {
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber or train is required\"}", "application/json");
                 return;
             }
 
@@ -223,12 +246,11 @@ public class ReservationServer {
             }
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-            String tNum = params.get("trainNumber");
-            if (tNum == null || tNum.isBlank()) tNum = params.get("q");
-            String dayOffset = params.getOrDefault("dayOffset", "today");
+            String tNum = params.getOrDefault("trainNumber", params.getOrDefault("train", params.get("q")));
+            String dayOffset = params.getOrDefault("dayOffset", params.getOrDefault("day", "today"));
 
             if (tNum == null || tNum.isBlank()) {
-                sendResponse(exchange, 400, "{\"error\":\"trainNumber or q is required\"}", "application/json");
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber or train is required\"}", "application/json");
                 return;
             }
 
@@ -272,13 +294,13 @@ public class ReservationServer {
             }
 
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-            String tNum = params.get("trainNumber");
-            String cType = params.getOrDefault("classType", "3A");
-            String coach = params.get("coach");
-            String date = params.get("date");
+            String tNum = params.getOrDefault("trainNumber", params.get("train"));
+            String cType = params.getOrDefault("classType", params.getOrDefault("class", "3A"));
+            String coach = params.getOrDefault("coach", "B1");
+            String date = params.getOrDefault("date", java.time.LocalDate.now().toString());
 
-            if (tNum == null || date == null) {
-                sendResponse(exchange, 400, "{\"error\":\"trainNumber and date parameters required\"}", "application/json");
+            if (tNum == null || tNum.isBlank()) {
+                sendResponse(exchange, 400, "{\"error\":\"trainNumber or train parameter required\"}", "application/json");
                 return;
             }
 

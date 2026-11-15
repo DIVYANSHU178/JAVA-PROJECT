@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="dishaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="sareeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+  </defs>
+  <!-- Background Badge -->
+  <circle cx="50" cy="50" r="48" fill="url(#dishaBg)" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="50" cy="50" r="43" fill="#ffffff"/>
+  <!-- Hair & Head -->
+  <ellipse cx="50" cy="40" rx="22" ry="24" fill="#1e293b"/>
+  <!-- Face -->
+  <ellipse cx="50" cy="44" rx="16" ry="17" fill="#fde047" opacity="0.3"/>
+  <ellipse cx="50" cy="44" rx="15" ry="16" fill="#fcd34d"/>
+  <!-- Hair Bangs -->
+  <path d="M 35 34 C 40 28, 60 28, 65 34 C 62 40, 56 36, 50 36 C 44 36, 38 40, 35 34 Z" fill="#0f172a"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="42" r="2.2" fill="#0f172a"/>
+  <circle cx="56" cy="42" r="2.2" fill="#0f172a"/>
+  <!-- Smile -->
+  <path d="M 45 49 Q 50 54 55 49" fill="none" stroke="#be123c" stroke-width="2" stroke-linecap="round"/>
+  <!-- Bindi -->
+  <circle cx="50" cy="38" r="1.2" fill="#e11d48"/>
+  <!-- Headset -->
+  <path d="M 33 42 A 18 18 0 0 1 67 42" fill="none" stroke="#475569" stroke-width="2.5"/>
+  <rect x="31" y="40" width="3.5" height="7" rx="1.5" fill="#1e293b"/>
+  <rect x="65.5" y="40" width="3.5" height="7" rx="1.5" fill="#1e293b"/>
+  <path d="M 67 45 Q 60 56 53 54" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="52" cy="54" r="2" fill="#0f172a"/>
+  <!-- Professional Saree Uniform -->
+  <path d="M 28 85 C 28 66, 72 66, 72 85 Z" fill="url(#sareeGradient)"/>
+  <path d="M 37 68 L 50 85 L 63 68" fill="#f59e0b"/>
+  <!-- Name Tag -->
+  <rect x="42" y="74" width="16" height="5" rx="1" fill="#ffffff"/>
+  <text x="44" y="78" font-family="Arial, sans-serif" font-weight="900" font-size="4" fill="#0b2545">DISHA</text>
+</svg>

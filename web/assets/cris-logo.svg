@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 50" width="140" height="50">
+  <rect width="140" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="14" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#0b2545" letter-spacing="2">CRIS</text>
+  <text x="68" y="24" font-family="Arial, sans-serif" font-weight="700" font-size="7" fill="#64748b">CENTRE FOR</text>
+  <text x="68" y="33" font-family="Arial, sans-serif" font-weight="700" font-size="7" fill="#64748b">RAILWAY INFO.</text>
+  <text x="68" y="42" font-family="Arial, sans-serif" font-weight="700" font-size="7" fill="#e11d48">SYSTEMS</text>
+</svg>

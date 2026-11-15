@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="60%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="360" fill="url(#bgGrad)"/>
+  <!-- Temple & Heritage Silhouettes -->
+  <path d="M 620 280 L 650 160 L 680 280 Z" fill="#065f46" opacity="0.6"/>
+  <path d="M 640 160 L 650 130 L 660 160 Z" fill="#f59e0b" opacity="0.8"/>
+  <circle cx="650" cy="125" r="4" fill="#f59e0b"/>
+  <!-- Tourist Train Illustration -->
+  <rect x="60" y="190" width="680" height="95" rx="6" fill="#f8fafc" stroke="#f59e0b" stroke-width="3"/>
+  <rect x="60" y="245" width="680" height="15" fill="#f97316"/>
+  <rect x="60" y="215" width="680" height="8" fill="#1e3a8a"/>
+  <!-- Windows -->
+  <rect x="90" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="170" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="250" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="330" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="410" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="490" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="570" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <rect x="650" y="200" width="60" height="35" rx="3" fill="#0f172a"/>
+  <!-- Text Overlay -->
+  <rect x="40" y="30" width="380" height="110" rx="12" fill="#022c22" opacity="0.9" stroke="#34d399"/>
+  <text x="60" y="65" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="900" font-size="22" fill="#ffffff">BHARAT GAURAV</text>
+  <text x="60" y="88" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="700" font-size="12" fill="#34d399" letter-spacing="1.5">DEKHO APNA DESH • TOURIST TRAIN</text>
+  <text x="60" y="115" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="500" font-size="11" fill="#a7f3d0">Shri Ramayana Yatra • Jyotirlinga Darshan • All Inclusive Packages</text>
+</svg>

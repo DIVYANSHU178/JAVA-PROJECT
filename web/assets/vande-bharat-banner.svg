@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b2545" />
+      <stop offset="60%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+    <linearGradient id="trainWhite" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="saffronStripe" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff7700" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+  </defs>
+  <!-- Background Scenic Sky -->
+  <rect width="800" height="360" fill="url(#skyGrad)"/>
+  <!-- Distant Mountains -->
+  <polygon points="0,260 120,180 260,240 420,160 580,250 720,190 800,240 800,360 0,360" fill="#1e3a8a" opacity="0.4"/>
+  <polygon points="80,260 220,190 350,250 500,170 650,260 800,210 800,360 0,360" fill="#0f172a" opacity="0.5"/>
+  <!-- High Speed Track Bed -->
+  <polygon points="0,310 800,280 800,360 0,360" fill="#334155"/>
+  <line x1="0" y1="318" x2="800" y2="288" stroke="#94a3b8" stroke-width="4"/>
+  <line x1="0" y1="335" x2="800" y2="305" stroke="#94a3b8" stroke-width="5"/>
+  <!-- Speed Lines -->
+  <line x1="20" y1="230" x2="180" y2="230" stroke="#ffffff" stroke-width="2" opacity="0.6" stroke-dasharray="10,15"/>
+  <line x1="50" y1="245" x2="250" y2="245" stroke="#ffffff" stroke-width="2" opacity="0.4" stroke-dasharray="15,20"/>
+  <!-- Aerodynamic Vande Bharat Train Nose -->
+  <!-- Main Body -->
+  <path d="M 800 170 L 380 170 Q 220 172 150 225 Q 100 265 80 295 L 800 295 Z" fill="url(#trainWhite)"/>
+  <!-- Sleek Dark Window Strip -->
+  <path d="M 800 195 L 370 195 Q 240 195 180 228 Q 140 252 125 275 L 800 275 Z" fill="url(#glassGrad)"/>
+  <!-- Iconic Vande Bharat Orange/Saffron Livery Band -->
+  <path d="M 800 275 L 125 275 Q 115 285 105 290 L 800 290 Z" fill="url(#saffronStripe)"/>
+  <path d="M 800 185 L 360 185 Q 260 185 200 215 L 800 215 Z" fill="#2563eb" opacity="0.9"/>
+  <!-- Aerodynamic Cockpit Windshield -->
+  <polygon points="190,225 280,210 270,245 160,250" fill="#0284c7" opacity="0.8"/>
+  <!-- Sleek Headlight Beam -->
+  <polygon points="90,288 0,320 0,260" fill="#fef08a" opacity="0.35"/>
+  <circle cx="95" cy="288" r="5" fill="#fef08a"/>
+  <!-- Overhead Catenary Electric Pantograph -->
+  <polyline points="480,170 470,120 520,95 490,95" fill="none" stroke="#94a3b8" stroke-width="3"/>
+  <line x1="470" y1="95" x2="540" y2="95" stroke="#ef4444" stroke-width="4"/>
+  <line x1="0" y1="95" x2="800" y2="95" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,6"/>
+  <!-- Branding Overlay Card -->
+  <rect x="36" y="30" width="340" height="110" rx="12" fill="#0b2545" opacity="0.88" stroke="rgba(255,255,255,0.2)"/>
+  <text x="56" y="65" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="900" font-size="22" fill="#ffffff">VANDE BHARAT 2.0</text>
+  <text x="56" y="88" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="700" font-size="12" fill="#f97316" letter-spacing="1.5">INDIA'S PRIDE • 160 KM/H SEMI-HIGH SPEED</text>
+  <text x="56" y="115" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="500" font-size="11" fill="#cbd5e1">54 Modern Routes • Executive Chair Car • 360° Rotating Seats</text>
+</svg>

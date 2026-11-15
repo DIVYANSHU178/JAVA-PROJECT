@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <linearGradient id="railMaroon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#800000" />
+      <stop offset="100%" stop-color="#560000" />
+    </linearGradient>
+    <linearGradient id="railGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(10, 5)">
+    <!-- Outer Cogwheel Seal -->
+    <circle cx="25" cy="25" r="23" fill="url(#railMaroon)" stroke="url(#railGold)" stroke-width="2"/>
+    <circle cx="25" cy="25" r="17" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="3,2"/>
+    <!-- Steam Engine Silhouette -->
+    <path d="M 17 28 L 22 20 L 31 20 L 33 28 Z M 16 28 L 34 28 L 34 32 L 16 32 Z" fill="url(#railGold)"/>
+    <circle cx="20" cy="33" r="2.5" fill="#ffffff"/>
+    <circle cx="25" cy="33" r="2.5" fill="#ffffff"/>
+    <circle cx="30" cy="33" r="2.5" fill="#ffffff"/>
+    <rect x="23" y="16" width="3" height="4" fill="url(#railGold)"/>
+  </g>
+  <text x="68" y="27" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="14" fill="#800000" letter-spacing="0.5">भारतीय रेल</text>
+  <text x="68" y="44" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="700" font-size="12" fill="#1e293b" letter-spacing="0.8">INDIAN RAILWAYS</text>
+</svg>

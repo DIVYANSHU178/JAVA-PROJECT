@@ -1,0 +1,2394 @@
+import os
+
+def generate_index_html():
+    html_content = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRCTC Next Generation eTicketing System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --irctc-navy: #213d77;
+            --irctc-dark-navy: #0b2545;
+            --irctc-deep: #07192f;
+            --irctc-orange: #fb792b;
+            --irctc-orange-hover: #e06114;
+            --irctc-blue: #007bff;
+            --irctc-gray-bg: #f5f5f5;
+            --irctc-border: #e2e8f0;
+            --irctc-card-bg: #ffffff;
+            --irctc-text: #2c3e50;
+            --irctc-muted: #64748b;
+            --irctc-green: #059669;
+            --irctc-amber: #d97706;
+            --irctc-red: #dc2626;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-subtle: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-card: 0 4px 16px rgba(11,37,69,0.1);
+            --shadow-hover: 0 8px 24px rgba(11,37,69,0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        body { background: var(--irctc-gray-bg); color: var(--irctc-text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        /* TIER 1: UTILITY TOP BAR */
+        .utility-bar {
+            background: #ffffff; border-bottom: 1px solid #e0e0e0; padding: 4px 20px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; color: #475569;
+        }
+        .utility-left, .utility-right { display: flex; align-items: center; gap: 14px; }
+        .utility-item { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; color: inherit; font-weight: 600; cursor: pointer; }
+        .utility-item:hover { color: var(--irctc-orange); }
+        .clock-display { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--irctc-dark-navy); background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #cbd5e1; }
+        .font-adjusters { display: inline-flex; gap: 4px; border-left: 1px solid #cbd5e1; padding-left: 10px; }
+        .font-btn { border: 1px solid #cbd5e1; background: #fff; padding: 2px 6px; font-size: 0.72rem; font-weight: 800; border-radius: 3px; cursor: pointer; }
+        .font-btn:hover { background: #f1f5f9; color: var(--irctc-orange); }
+        .btn-auth-top { background: var(--irctc-navy); color: #fff; padding: 3px 12px; border-radius: 4px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; font-size: 0.74rem; transition: background 0.2s; }
+        .btn-auth-top:hover { background: var(--irctc-dark-navy); }
+
+        /* TIER 2: BRANDING LOGOS BAR */
+        .brand-bar {
+            background: #ffffff; padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--irctc-orange);
+        }
+        .brand-logos { display: flex; align-items: center; gap: 16px; }
+        .irctc-brand-logo { height: 48px; object-fit: contain; }
+        .brand-railways { display: flex; align-items: center; gap: 12px; border-left: 1px solid #e2e8f0; padding-left: 16px; }
+        .railways-logo { height: 48px; object-fit: contain; }
+        .brand-taglines h2 { font-size: 1.05rem; font-weight: 800; color: var(--irctc-dark-navy); line-height: 1.2; }
+        .brand-taglines p { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+        .brand-cris { display: flex; align-items: center; gap: 12px; }
+        .cris-logo { height: 42px; object-fit: contain; }
+
+        /* TIER 3: NAVY MAIN NAVIGATION BAR */
+        .irctc-nav {
+            background: var(--irctc-navy); color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100;
+        }
+        .nav-container {
+            max-width: 1360px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; overflow-x: auto;
+        }
+        .nav-links { display: flex; align-items: center; list-style: none; }
+        .nav-link-item { position: relative; }
+        .nav-link-btn {
+            background: none; border: none; color: #ffffff; padding: 12px 14px; font-size: 0.85rem; font-weight: 700;
+            display: flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; white-space: nowrap; transition: background 0.2s;
+        }
+        .nav-link-btn:hover, .nav-link-btn.active { background: rgba(0,0,0,0.22); color: #fed7aa; }
+        .nav-link-btn .carat { font-size: 0.65rem; transition: transform 0.2s; }
+        .nav-dropdown {
+            position: absolute; top: 100%; left: 0; background: #ffffff; color: var(--irctc-text); min-width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-radius: 0 0 var(--radius-sm) var(--radius-sm); border: 1px solid #cbd5e1;
+            display: none; flex-direction: column; z-index: 150;
+        }
+        .nav-link-item:hover .nav-dropdown { display: flex; }
+        .nav-dropdown a, .nav-dropdown button {
+            padding: 10px 16px; text-align: left; font-size: 0.82rem; font-weight: 600; color: #334155; text-decoration: none;
+            background: none; border: none; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.15s;
+        }
+        .nav-dropdown a:hover, .nav-dropdown button:hover { background: #eff6ff; color: var(--irctc-navy); font-weight: 700; }
+
+        /* ALERT TICKER */
+        .alert-ticker {
+            background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+            border-bottom: 1px solid #fde68a; color: #92400e; font-size: 0.8rem; font-weight: 700;
+            padding: 6px 20px; display: flex; align-items: center; gap: 12px;
+        }
+        .ticker-badge { background: #d97706; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; }
+        .ticker-text { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+        /* MAIN CONTENT WORKSPACE */
+        main { max-width: 1360px; margin: 16px auto; padding: 0 16px; width: 100%; flex: 1; }
+
+        /* 2-COLUMN HERO SECTION */
+        .hero-split-grid {
+            display: grid; grid-template-columns: 460px 1fr; gap: 20px; align-items: stretch; margin-bottom: 24px;
+        }
+        @media (max-width: 1024px) {
+            .hero-split-grid { grid-template-columns: 1fr; }
+        }
+
+        /* LEFT COLUMN: BOOK TICKET CARD */
+        .book-ticket-card {
+            background: #ffffff; border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+            border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .book-ticket-header {
+            background: var(--irctc-dark-navy); color: #ffffff; padding: 12px 18px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .book-ticket-title { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+        .book-mode-tabs { display: flex; background: rgba(255,255,255,0.12); border-radius: 6px; padding: 2px; }
+        .book-mode-tab {
+            padding: 4px 10px; font-size: 0.74rem; font-weight: 700; color: #cbd5e1; background: none; border: none;
+            border-radius: 4px; cursor: pointer; transition: all 0.2s;
+        }
+        .book-mode-tab.active { background: #ffffff; color: var(--irctc-dark-navy); }
+
+        .book-ticket-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+        .input-row { display: flex; gap: 8px; align-items: center; position: relative; }
+        .field-box { flex: 1; position: relative; }
+        .field-box label { font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px; display: block; }
+        .field-input {
+            width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: var(--radius-sm); font-size: 0.88rem;
+            font-weight: 700; color: var(--irctc-text); background: #f8fafc; transition: border-color 0.2s, background 0.2s;
+        }
+        .field-input:focus { border-color: var(--irctc-navy); background: #ffffff; outline: none; }
+        .btn-swap {
+            width: 36px; height: 36px; border-radius: 50%; background: #eff6ff; border: 1.5px solid #bfdbfe;
+            color: var(--irctc-navy); font-size: 1.1rem; font-weight: 800; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; margin-top: 18px; transition: transform 0.2s, background 0.2s;
+        }
+        .btn-swap:hover { background: #dbeafe; transform: rotate(180deg); }
+
+        .autocomplete-dropdown {
+            position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: #ffffff;
+            border: 1px solid #cbd5e1; border-radius: var(--radius-sm); box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            max-height: 220px; overflow-y: auto; z-index: 200; display: none;
+        }
+        .station-suggestion {
+            padding: 8px 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center; font-size: 0.82rem;
+        }
+        .station-suggestion:hover { background: #f0fdf4; color: var(--irctc-navy); font-weight: 700; }
+        .station-suggestion-code { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--irctc-orange); }
+
+        /* CONCESSIONS CHECKBOXES */
+        .concessions-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.74rem; font-weight: 600; color: #475569;
+            background: #f8fafc; padding: 10px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;
+        }
+        .concessions-grid label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .concessions-grid input[type="checkbox"] { accent-color: var(--irctc-orange); cursor: pointer; }
+
+        .btn-search-primary {
+            background: var(--irctc-orange); color: #ffffff; border: none; border-radius: var(--radius-sm);
+            padding: 12px; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(251, 121, 43, 0.35); transition: background 0.2s, transform 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-search-primary:hover { background: var(--irctc-orange-hover); }
+        .btn-search-primary:active { transform: scale(0.99); }
+
+        .btn-ask-disha-hero {
+            background: #eff6ff; color: var(--irctc-navy); border: 1.5px solid #bfdbfe; border-radius: var(--radius-sm);
+            padding: 8px 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 8px; transition: background 0.2s;
+        }
+        .btn-ask-disha-hero:hover { background: #dbeafe; }
+
+        /* RIGHT COLUMN: HERO CAROUSEL */
+        .hero-carousel-card {
+            background: #000; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-card);
+            position: relative; display: flex; align-items: stretch; min-height: 420px;
+        }
+        .carousel-slide {
+            position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease-in-out;
+            background-size: cover; background-position: center; display: flex; align-items: flex-end;
+        }
+        .carousel-slide.active { opacity: 1; position: relative; flex: 1; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .carousel-controls {
+            position: absolute; bottom: 14px; right: 18px; display: flex; gap: 8px; z-index: 20;
+        }
+        .carousel-dot {
+            width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.4); border: none;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .carousel-dot.active { background: var(--irctc-orange); width: 24px; border-radius: 6px; }
+
+        /* IRCTC 8 SERVICES GRID */
+        .services-section {
+            background: #ffffff; border-radius: var(--radius-md); padding: 20px 24px;
+            box-shadow: var(--shadow-subtle); border: 1px solid #e2e8f0; margin-bottom: 24px;
+        }
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;
+        }
+        .section-title { font-size: 1.15rem; font-weight: 800; color: var(--irctc-dark-navy); display: flex; align-items: center; gap: 8px; }
+        .services-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px;
+        }
+        .service-card {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 14px 10px;
+            text-align: center; text-decoration: none; color: inherit; cursor: pointer; transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--irctc-orange); background: #ffffff; }
+        .service-icon-circle {
+            width: 52px; height: 52px; border-radius: 50%; background: #eff6ff; display: flex;
+            align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 4px; border: 1px solid #bfdbfe;
+        }
+        .service-name { font-size: 0.8rem; font-weight: 800; color: var(--irctc-dark-navy); text-transform: uppercase; }
+        .service-sub { font-size: 0.68rem; color: #64748b; line-height: 1.2; font-weight: 500; }
+
+        /* TRENDING PACKAGES SECTION */
+        .packages-section {
+            background: #ffffff; border-radius: var(--radius-md); padding: 20px 24px;
+            box-shadow: var(--shadow-subtle); border: 1px solid #e2e8f0; margin-bottom: 24px;
+        }
+        .packages-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+        }
+        .package-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius-md); overflow: hidden;
+            box-shadow: var(--shadow-subtle); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column;
+        }
+        .package-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .package-banner { width: 100%; height: 160px; object-fit: cover; }
+        .package-content { padding: 14px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; }
+        .package-title { font-size: 0.95rem; font-weight: 800; color: var(--irctc-dark-navy); margin-bottom: 4px; }
+        .package-desc { font-size: 0.76rem; color: #64748b; margin-bottom: 12px; }
+        .package-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+        .package-price { font-size: 1.05rem; font-weight: 800; color: var(--irctc-orange); }
+        .btn-package-book { background: var(--irctc-navy); color: #fff; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; font-weight: 700; border: none; cursor: pointer; }
+        .btn-package-book:hover { background: var(--irctc-dark-navy); }
+
+        /* SEARCH RESULTS STYLING */
+        .train-card {
+            background: #ffffff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 18px 20px;
+            margin-bottom: 16px; box-shadow: var(--shadow-subtle); transition: box-shadow 0.2s;
+        }
+        .train-card:hover { box-shadow: var(--shadow-card); }
+        .train-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+        .train-title-no { font-size: 1.15rem; font-weight: 800; color: var(--irctc-dark-navy); }
+        .train-runs-on { font-size: 0.72rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+        .runs-badge { display: inline-block; padding: 1px 4px; border-radius: 3px; margin-right: 2px; font-weight: 700; }
+        .runs-badge.active { background: #dcfce7; color: #166534; }
+        .runs-badge.inactive { background: #f1f5f9; color: #94a3b8; }
+
+        .train-route-visual {
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; margin-bottom: 16px;
+            background: #f8fafc; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;
+        }
+        .time-large { font-size: 1.25rem; font-weight: 800; color: var(--irctc-text); font-family: 'JetBrains Mono', monospace; }
+        .station-name { font-size: 0.82rem; font-weight: 700; color: #475569; }
+        .journey-duration-badge {
+            background: #ffffff; border: 1px solid #cbd5e1; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.76rem; font-weight: 700; color: #64748b; text-align: center;
+        }
+
+        /* AVAILABILITY MATRIX TILES */
+        .class-availability-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;
+        }
+        .class-tier-tile {
+            background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: var(--radius-sm); padding: 10px;
+            cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .class-tier-tile:hover { border-color: var(--irctc-navy); background: #ffffff; }
+        .class-tier-tile.active { border-color: var(--irctc-orange); background: #fffaf5; box-shadow: 0 0 0 2px rgba(251,121,43,0.2); }
+        .class-code { font-weight: 800; font-size: 0.95rem; color: var(--irctc-dark-navy); display: flex; justify-content: space-between; }
+        .class-fare { font-weight: 800; color: var(--irctc-orange); font-size: 0.9rem; margin-top: 4px; }
+        .class-status-badge {
+            font-size: 0.72rem; font-weight: 800; padding: 3px 6px; border-radius: 4px; margin-top: 6px; text-align: center;
+        }
+        .status-available { background: #dcfce7; color: #15803d; }
+        .status-rac { background: #fef3c7; color: #b45309; }
+        .status-wl { background: #fee2e2; color: #b91c1c; }
+
+        /* 6-DAY AVAILABILITY MATRIX TABS */
+        .day-matrix-strip {
+            display: flex; gap: 8px; overflow-x: auto; padding: 6px 0 12px; margin-bottom: 12px; border-top: 1px solid #f1f5f9;
+        }
+        .day-matrix-tile {
+            flex: 1; min-width: 110px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: var(--radius-sm);
+            padding: 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+        }
+        .day-matrix-tile:hover { border-color: var(--irctc-navy); }
+        .day-matrix-tile.selected { border-color: var(--irctc-orange); background: #fff7ed; }
+        .matrix-date { font-size: 0.74rem; font-weight: 700; color: #64748b; }
+        .matrix-status { font-size: 0.78rem; font-weight: 800; margin-top: 2px; }
+
+        /* LIVE STATUS STYLING */
+        .live-status-card {
+            background: #ffffff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 20px;
+            box-shadow: var(--shadow-subtle); margin-top: 16px;
+        }
+        .live-status-header {
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+        }
+        .live-halt-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .live-halt-table th { background: #f1f5f9; color: #475569; font-weight: 700; text-align: left; padding: 10px 12px; border-bottom: 1px solid #cbd5e1; }
+        .live-halt-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+        .live-halt-table tr:hover { background: #f8fafc; }
+        .badge-passed { background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
+        .badge-current { background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 0.72rem; animation: pulse 1.5s infinite; }
+        .badge-upcoming { background: #eff6ff; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
+
+        /* INTERACTIVE COACH BAY STYLING */
+        .coach-container {
+            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: var(--radius-md); padding: 18px; margin-top: 16px;
+        }
+        .coach-bays-wrapper { display: flex; flex-direction: column; gap: 14px; overflow-x: auto; }
+        .coach-bay {
+            background: #ffffff; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 12px;
+            display: grid; grid-template-columns: 2fr auto 1fr; gap: 12px; align-items: center;
+        }
+        .cabin-seats, .side-seats { display: grid; gap: 6px; }
+        .cabin-seats { grid-template-columns: repeat(3, 1fr); }
+        .side-seats { grid-template-columns: repeat(2, 1fr); }
+        .aisle-divider { width: 20px; text-align: center; font-size: 0.68rem; color: #94a3b8; font-weight: 700; }
+        .berth-box {
+            border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; text-align: center; cursor: pointer;
+            transition: all 0.15s; font-size: 0.74rem; font-weight: 700;
+        }
+        .berth-available { background: #ecfdf5; border-color: #86efac; color: #166534; }
+        .berth-available:hover { background: #bbf7d0; transform: scale(1.05); }
+        .berth-selected { background: #2563eb !important; border-color: #1d4ed8 !important; color: #ffffff !important; }
+        .berth-booked { background: #fee2e2; border-color: #fca5a5; color: #991b1b; cursor: not-allowed; }
+        .berth-rac { background: #fef3c7; border-color: #fde68a; color: #92400e; }
+
+        /* ASK DISHA 2.0 FLOATING WIDGET */
+        .ask-disha-widget {
+            position: fixed; bottom: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; align-items: flex-end;
+        }
+        .ask-disha-trigger {
+            background: linear-gradient(135deg, #1d4ed8 0%, #0b2545 100%); color: #ffffff;
+            border-radius: 999px; padding: 6px 18px 6px 8px; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 8px 24px rgba(11, 37, 69, 0.35); cursor: pointer; border: 2px solid #ffffff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .ask-disha-trigger:hover { transform: scale(1.04); box-shadow: 0 12px 30px rgba(11, 37, 69, 0.45); }
+        .disha-avatar-img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+        .disha-trigger-text { display: flex; flex-direction: column; }
+        .disha-trigger-title { font-weight: 800; font-size: 0.88rem; letter-spacing: 0.3px; }
+        .disha-trigger-sub { font-size: 0.68rem; color: #93c5fd; font-weight: 600; }
+
+        /* DISHA CHAT DRAWER */
+        .disha-chat-drawer {
+            width: 360px; height: 480px; background: #ffffff; border-radius: var(--radius-lg);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; margin-bottom: 12px;
+            display: none; flex-direction: column; overflow: hidden; animation: slideUp 0.25s ease-out;
+        }
+        .disha-chat-header {
+            background: var(--irctc-navy); color: #ffffff; padding: 12px 16px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .disha-chat-body { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; font-size: 0.82rem; }
+        .disha-msg { max-width: 85%; padding: 8px 12px; border-radius: 12px; line-height: 1.35; }
+        .disha-msg-ai { background: #ffffff; border: 1px solid #e2e8f0; align-self: flex-start; color: var(--irctc-text); border-bottom-left-radius: 2px; }
+        .disha-msg-user { background: var(--irctc-navy); color: #ffffff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .disha-quick-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .disha-chip {
+            background: #eff6ff; border: 1px solid #bfdbfe; color: var(--irctc-navy); padding: 4px 10px;
+            border-radius: 14px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+        }
+        .disha-chip:hover { background: var(--irctc-navy); color: #ffffff; }
+        .disha-chat-footer {
+            padding: 8px 12px; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px;
+        }
+        .disha-chat-input {
+            flex: 1; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 7px 10px; font-size: 0.82rem;
+        }
+        .disha-chat-send {
+            background: var(--irctc-orange); color: #fff; border: none; border-radius: var(--radius-sm);
+            padding: 0 12px; font-weight: 700; cursor: pointer;
+        }
+
+        /* MODALS (BOOKING, PNR, CANCELLATION, E-TICKET, AUTH) */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(11, 37, 69, 0.6); backdrop-filter: blur(4px);
+            z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #ffffff; border-radius: var(--radius-md); width: 100%; max-width: 680px; max-height: 90vh;
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            background: var(--irctc-dark-navy); color: #ffffff; padding: 14px 20px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; }
+
+        /* ELECTRONIC RESERVATION SLIP (ERS) PRINTABLE */
+        .ers-ticket {
+            border: 2px solid var(--irctc-dark-navy); padding: 20px; background: #fff; font-size: 0.82rem; line-height: 1.4;
+        }
+        .ers-header {
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--irctc-orange);
+            padding-bottom: 10px; margin-bottom: 12px;
+        }
+        .ers-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .ers-table th, .ers-table td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; }
+        .ers-table th { background: #f1f5f9; font-weight: 700; }
+
+        /* FOOTER */
+        footer {
+            background: var(--irctc-deep); color: #cbd5e1; font-size: 0.78rem; padding: 30px 24px 20px; margin-top: 40px;
+        }
+        .footer-grid {
+            max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 24px;
+        }
+        @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr; } }
+        .footer-col h4 { color: #ffffff; font-size: 0.92rem; font-weight: 800; margin-bottom: 12px; }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .footer-links a { color: #94a3b8; text-decoration: none; }
+        .footer-links a:hover { color: var(--irctc-orange); }
+        .footer-bottom {
+            max-width: 1360px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 16px; text-align: center; color: #64748b; font-size: 0.72rem;
+        }
+
+        /* TOAST NOTIFICATION */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast {
+            background: #ffffff; border-left: 4px solid var(--irctc-orange); padding: 12px 18px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15); border-radius: 4px; font-size: 0.84rem; font-weight: 700;
+            display: flex; align-items: center; gap: 8px; animation: slideIn 0.2s ease-out;
+        }
+        .toast.success { border-left-color: var(--irctc-green); }
+        .toast.error { border-left-color: var(--irctc-red); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+    </style>
+</head>
+<body>
+
+    <!-- TIER 1: UTILITY TOP BAR -->
+    <div class="utility-bar">
+        <div class="utility-left">
+            <span class="utility-item">🇮🇳 Government of India • Ministry of Railways</span>
+            <span class="utility-item">CRIS • Centre for Railway Information Systems</span>
+            <span class="utility-item clock-display" id="ist-live-clock">--:--:-- IST</span>
+        </div>
+        <div class="utility-right">
+            <span class="font-adjusters">
+                <button type="button" class="font-btn" onclick="adjustFontSize(-1)">A-</button>
+                <button type="button" class="font-btn" onclick="adjustFontSize(0)">A</button>
+                <button type="button" class="font-btn" onclick="adjustFontSize(1)">A+</button>
+            </span>
+            <span class="utility-item" onclick="toggleAskDishaChat()">💬 Ask DISHA</span>
+            <span class="utility-item" onclick="showNotification('IRCTC Customer Care Helpline: 14646 / 0755-6610661', 'info')">📞 Help &amp; Support</span>
+            <span class="utility-item" onclick="toggleLanguage()" id="lang-switch-btn">🌐 हिंदी</span>
+            <button type="button" class="btn-auth-top" id="top-user-btn" onclick="openUserModal()">LOGIN / REGISTER</button>
+        </div>
+    </div>
+
+    <!-- TIER 2: BRANDING LOGOS BAR -->
+    <header class="brand-bar">
+        <div class="brand-logos">
+            <a href="/" title="IRCTC Official Portal">
+                <img src="/assets/irctc-logo.svg" alt="IRCTC Official Logo" class="irctc-brand-logo">
+            </a>
+            <div class="brand-railways">
+                <img src="/assets/indian-railways-logo.svg" alt="Indian Railways National Emblem" class="railways-logo">
+                <div class="brand-taglines">
+                    <h2>INDIAN RAILWAYS</h2>
+                    <p>Safety • Security • Punctuality</p>
+                </div>
+            </div>
+        </div>
+        <div class="brand-cris">
+            <img src="/assets/cris-logo.svg" alt="CRIS Official Logo" class="cris-logo">
+        </div>
+    </header>
+
+    <!-- TIER 3: NAVY MAIN NAVIGATION BAR -->
+    <nav class="irctc-nav">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn active" id="nav-btn-book" onclick="switchMainView('book')">
+                        🚂 TRAINS <span class="carat">▼</span>
+                    </button>
+                    <div class="nav-dropdown">
+                        <button type="button" onclick="switchMainView('book')">Book Ticket</button>
+                        <button type="button" onclick="switchMainView('live')">Spot Your Train (Live Running Status)</button>
+                        <button type="button" onclick="switchMainView('pnr')">PNR Enquiry</button>
+                        <button type="button" onclick="switchMainView('coach')">Seat / Berth Layout</button>
+                        <button type="button" onclick="switchMainView('cancel')">Cancel Ticket &amp; Refund</button>
+                    </div>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="showNotification('IRCTC Bus Booking connects over 50,000 routes across India.', 'info')">
+                        🚌 BUSES
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="showNotification('IRCTC Air offers lowest convenience fees on flight tickets.', 'info')">
+                        ✈️ FLIGHTS
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="showNotification('IRCTC Retiring Rooms available at over 500 major railway stations.', 'info')">
+                        🏨 HOTELS
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn">
+                        🌴 HOLIDAYS <span class="carat">▼</span>
+                    </button>
+                    <div class="nav-dropdown">
+                        <button type="button" onclick="filterTourPackages('all')">Special Tourist Trains</button>
+                        <button type="button" onclick="filterTourPackages('maharajas')">Maharajas Express Luxury</button>
+                        <button type="button" onclick="filterTourPackages('gaurav')">Bharat Gaurav Yatra</button>
+                        <button type="button" onclick="filterTourPackages('domestic')">Domestic Air &amp; Rail Tours</button>
+                    </div>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn">
+                        💳 LOYALTY <span class="carat">▼</span>
+                    </button>
+                    <div class="nav-dropdown">
+                        <button type="button" onclick="showNotification('IRCTC SBI Platinum Card: Save up to 10% on train bookings', 'info')">IRCTC SBI Platinum Card</button>
+                        <button type="button" onclick="showNotification('IRCTC BoB RuPay Contactless Credit Card', 'info')">IRCTC BoB RuPay Card</button>
+                    </div>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="showNotification('Order hot & hygienic food delivered to your berth via E-Catering (call 1323)', 'info')">
+                        🍱 MEALS (E-CATERING)
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="switchMainView('live')">
+                        📍 SPOT TRAIN (NTES)
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="switchMainView('pnr')">
+                        🎫 PNR ENQUIRY
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="switchMainView('cancel')">
+                        ❌ CANCEL TICKET
+                    </button>
+                </li>
+                <li class="nav-link-item">
+                    <button type="button" class="nav-link-btn" onclick="switchMainView('profile')">
+                        👤 MY ACCOUNT
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ALERT TICKER -->
+    <div class="alert-ticker">
+        <span class="ticker-badge">TATKAL NOTIFICATION</span>
+        <span class="ticker-text" id="ticker-tatkal-content">
+            Tatkal Booking timings: AC Classes (1A/2A/3A/CC/EC/3E) open at 10:00 AM IST. Non-AC Classes (SL/2S) open at 11:00 AM IST. Please verify your KYC details.
+        </span>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main>
+
+        <!-- VIEW 1: BOOK TICKET & HERO SECTION -->
+        <section id="view-section-book">
+            <div class="hero-split-grid">
+                
+                <!-- LEFT COLUMN: AUTHENTIC BOOK TICKET CARD -->
+                <div class="book-ticket-card">
+                    <div class="book-ticket-header">
+                        <div class="book-ticket-title">
+                            <span>🚂</span> BOOK TICKET
+                        </div>
+                        <div class="book-mode-tabs">
+                            <button type="button" class="book-mode-tab active" id="mode-tab-route" onclick="setSearchMode('route')">By Route</button>
+                            <button type="button" class="book-mode-tab" id="mode-tab-train" onclick="setSearchMode('train')">By Train No</button>
+                        </div>
+                    </div>
+
+                    <div class="book-ticket-body">
+                        <!-- MODE A: SEARCH BY ROUTE -->
+                        <div id="search-box-route">
+                            <div class="input-row">
+                                <div class="field-box">
+                                    <label>From Station</label>
+                                    <input type="text" class="field-input" id="input-from" placeholder="Enter Station or Code" autocomplete="off" oninput="handleStationType('from')" value="NEW DELHI (NDLS)">
+                                    <input type="hidden" id="input-from-code" value="NDLS">
+                                    <div id="drop-from-station" class="autocomplete-dropdown"></div>
+                                </div>
+                                <button type="button" class="btn-swap" onclick="swapStations()" title="Swap From and To stations">⇅</button>
+                                <div class="field-box">
+                                    <label>To Station</label>
+                                    <input type="text" class="field-input" id="input-to" placeholder="Enter Station or Code" autocomplete="off" oninput="handleStationType('to')" value="BHOPAL JN (BPL)">
+                                    <input type="hidden" id="input-to-code" value="BPL">
+                                    <div id="drop-to-station" class="autocomplete-dropdown"></div>
+                                </div>
+                            </div>
+
+                            <div class="input-row" style="margin-top: 10px;">
+                                <div class="field-box">
+                                    <label>Journey Date</label>
+                                    <input type="date" class="field-input" id="input-journey-date">
+                                </div>
+                                <div class="field-box">
+                                    <label>Class</label>
+                                    <select class="field-input" id="select-class">
+                                        <option value="ALL">All Classes</option>
+                                        <option value="1A">AC First Class (1A)</option>
+                                        <option value="2A">AC 2 Tier (2A)</option>
+                                        <option value="3A">AC 3 Tier (3A)</option>
+                                        <option value="3E">AC 3 Economy (3E)</option>
+                                        <option value="CC">AC Chair Car (CC)</option>
+                                        <option value="EC">Exec. Chair Car (EC)</option>
+                                        <option value="SL">Sleeper (SL)</option>
+                                        <option value="2S">Second Sitting (2S)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="input-row" style="margin-top: 10px;">
+                                <div class="field-box">
+                                    <label>Quota</label>
+                                    <select class="field-input" id="select-quota" onchange="triggerSearch()">
+                                        <option value="GENERAL">GENERAL QUOTA (GN)</option>
+                                        <option value="TATKAL">TATKAL QUOTA (TQ)</option>
+                                        <option value="PREMIUM_TATKAL">PREMIUM TATKAL (PT)</option>
+                                        <option value="LADIES">LADIES QUOTA (LD)</option>
+                                        <option value="SENIOR_CITIZEN">LOWER BERTH / SR. CITIZEN</option>
+                                        <option value="DIVYANG">DIVYANG / PERSON WITH DISABILITY</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MODE B: SEARCH BY TRAIN NUMBER / NAME -->
+                        <div id="search-box-train" style="display: none;">
+                            <div class="field-box">
+                                <label>Train Number or Name</label>
+                                <input type="text" class="field-input" id="input-train-direct" placeholder="e.g. 22191, 12002, Bhopal Shatabdi" autocomplete="off" oninput="handleDirectTrainType()" value="22191">
+                                <div id="drop-train-direct" class="autocomplete-dropdown"></div>
+                            </div>
+                            <div class="input-row" style="margin-top: 10px;">
+                                <div class="field-box">
+                                    <label>Journey Date</label>
+                                    <input type="date" class="field-input" id="input-train-direct-date">
+                                </div>
+                                <div class="field-box">
+                                    <label>Quota</label>
+                                    <select class="field-input" id="select-train-direct-quota">
+                                        <option value="GENERAL">GENERAL QUOTA (GN)</option>
+                                        <option value="TATKAL">TATKAL QUOTA (TQ)</option>
+                                        <option value="LADIES">LADIES QUOTA (LD)</option>
+                                        <option value="SENIOR_CITIZEN">SR. CITIZEN</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCESSIONS CHECKBOXES -->
+                        <div class="concessions-grid">
+                            <label><input type="checkbox" id="chk-pwd"> Person With Disability Concession</label>
+                            <label><input type="checkbox" id="chk-flexible" checked> Flexible With Date</label>
+                            <label><input type="checkbox" id="chk-berth-avail"> Train with Available Berth</label>
+                            <label><input type="checkbox" id="chk-pass"> Railway Pass Concession</label>
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <button type="button" class="btn-search-primary" onclick="triggerSearch()">
+                            <span>🔍</span> SEARCH TRAINS
+                        </button>
+                        <button type="button" class="btn-ask-disha-hero" onclick="openDishaWithPrompt('Search trains from Delhi to Bhopal')">
+                            <img src="/assets/ask-disha-avatar.svg" style="width: 22px; height: 22px; border-radius: 50%;"> Easy Booking on Ask DISHA 2.0
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: HIGH-RES HERO PORTRAIT CAROUSEL -->
+                <div class="hero-carousel-card">
+                    <div class="carousel-slide active" id="slide-0">
+                        <img src="/assets/vande-bharat-banner.svg" alt="Vande Bharat Express 2.0 Portrait">
+                    </div>
+                    <div class="carousel-slide" id="slide-1">
+                        <img src="/assets/maharajas-express-banner.svg" alt="Maharajas' Express Luxury Train Portrait">
+                    </div>
+                    <div class="carousel-slide" id="slide-2">
+                        <img src="/assets/bharat-gaurav-banner.svg" alt="Bharat Gaurav Tourist Train Portrait">
+                    </div>
+                    <div class="carousel-slide" id="slide-3">
+                        <img src="/assets/tejas-express-banner.svg" alt="Tejas Express Luxury Train Portrait">
+                    </div>
+                    <div class="carousel-controls">
+                        <button type="button" class="carousel-dot active" onclick="setCarouselSlide(0)"></button>
+                        <button type="button" class="carousel-dot" onclick="setCarouselSlide(1)"></button>
+                        <button type="button" class="carousel-dot" onclick="setCarouselSlide(2)"></button>
+                        <button type="button" class="carousel-dot" onclick="setCarouselSlide(3)"></button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SEARCH RESULTS CONTAINER -->
+            <div id="search-results-area" style="margin-bottom: 24px;"></div>
+
+            <!-- IRCTC 8 OFFICIAL SERVICES GRID -->
+            <div class="services-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span>🏷️</span> Have you not found the right one? Explore IRCTC Services
+                    </div>
+                    <span style="font-size: 0.78rem; color: #64748b; font-weight: 600;">Government of India Certified</span>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card" onclick="showNotification('Flights: Zero convenience fee on Defence & Student airfare!', 'info')">
+                        <div class="service-icon-circle">✈️</div>
+                        <div class="service-name">FLIGHTS</div>
+                        <div class="service-sub">Lowest Convenience Fee</div>
+                    </div>
+                    <div class="service-card" onclick="showNotification('Hotels: Over 5,000 verified railway retiring rooms & hotels', 'info')">
+                        <div class="service-icon-circle">🏨</div>
+                        <div class="service-name">HOTELS</div>
+                        <div class="service-sub">Retiring Rooms &amp; Stays</div>
+                    </div>
+                    <div class="service-card" onclick="switchMainView('live')">
+                        <div class="service-icon-circle">🚂</div>
+                        <div class="service-name">RAIL DRISHTI</div>
+                        <div class="service-sub">Punctuality Dashboard</div>
+                    </div>
+                    <div class="service-card" onclick="showNotification('E-Catering: Order Domino\'s, Haldiram\'s & Subway to your berth!', 'info')">
+                        <div class="service-icon-circle">🍱</div>
+                        <div class="service-name">E-CATERING</div>
+                        <div class="service-sub">Order Food on Track</div>
+                    </div>
+                    <div class="service-card" onclick="showNotification('Bus Tickets: Connected with UPSRTC, GSRTC, MSRTC & private Volvos', 'info')">
+                        <div class="service-icon-circle">🚌</div>
+                        <div class="service-name">BUS TICKETS</div>
+                        <div class="service-sub">50,000+ State &amp; Volvo</div>
+                    </div>
+                    <div class="service-card" onclick="filterTourPackages('all')">
+                        <div class="service-icon-circle">🌴</div>
+                        <div class="service-name">HOLIDAYS</div>
+                        <div class="service-sub">All Inclusive Packages</div>
+                    </div>
+                    <div class="service-card" onclick="filterTourPackages('maharajas')">
+                        <div class="service-icon-circle">👑</div>
+                        <div class="service-name">TOURIST TRAIN</div>
+                        <div class="service-sub">Maharajas' Express</div>
+                    </div>
+                    <div class="service-card" onclick="showNotification('Hill Railways: UNESCO World Heritage Kalka-Shimla & Darjeeling Himalayan Railway', 'info')">
+                        <div class="service-icon-circle">⛰️</div>
+                        <div class="service-name">HILL RAILWAYS</div>
+                        <div class="service-sub">UNESCO World Heritage</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRENDING PACKAGES PORTRAITS -->
+            <div class="packages-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span>🌟</span> Trending IRCTC Tour Packages &amp; Heritage Specials
+                    </div>
+                    <span style="font-size: 0.78rem; color: #64748b; font-weight: 600;">Includes Train, Hotel, Meals &amp; Sightseeing</span>
+                </div>
+                <div class="packages-grid">
+                    <div class="package-card">
+                        <img src="/assets/tirupati-package.svg" alt="Tirupati Balaji Darshan" class="package-banner">
+                        <div class="package-content">
+                            <div>
+                                <div class="package-title">Tirupati Balaji Darshan Special</div>
+                                <div class="package-desc">2 Nights / 3 Days • Confirmed Sheegra Darshan, AC train journey, temple transfers &amp; certified guide.</div>
+                            </div>
+                            <div class="package-footer">
+                                <span class="package-price">₹8,450 <small style="font-size: 0.68rem; color: #64748b;">/person</small></span>
+                                <button type="button" class="btn-package-book" onclick="bookTourPackage('Tirupati Balaji Darshan')">Book Package</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="package-card">
+                        <img src="/assets/kashmir-package.svg" alt="Kashmir Heaven on Earth" class="package-banner">
+                        <div class="package-content">
+                            <div>
+                                <div class="package-title">Kashmir Heaven on Earth</div>
+                                <div class="package-desc">5 Nights / 6 Days • Srinagar, Gulmarg, Sonamarg &amp; Pahalgam. Houseboat stay on Dal Lake with Shikara ride.</div>
+                            </div>
+                            <div class="package-footer">
+                                <span class="package-price">₹18,999 <small style="font-size: 0.68rem; color: #64748b;">/person</small></span>
+                                <button type="button" class="btn-package-book" onclick="bookTourPackage('Kashmir Heaven on Earth')">Book Package</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="package-card">
+                        <img src="/assets/shirdi-package.svg" alt="Shirdi Sai Divine Yatra" class="package-banner">
+                        <div class="package-content">
+                            <div>
+                                <div class="package-title">Shirdi Sai Divine Yatra</div>
+                                <div class="package-desc">1 Night / 2 Days • VIP Samadhi Mandir darshan, Shani Shingnapur visit, 3-star hotel accommodation &amp; satvik meals.</div>
+                            </div>
+                            <div class="package-footer">
+                                <span class="package-price">₹4,299 <small style="font-size: 0.68rem; color: #64748b;">/person</small></span>
+                                <button type="button" class="btn-package-book" onclick="bookTourPackage('Shirdi Sai Divine Yatra')">Book Package</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="package-card">
+                        <img src="/assets/golden-triangle-package.svg" alt="Golden Triangle Tour" class="package-banner">
+                        <div class="package-content">
+                            <div>
+                                <div class="package-title">Golden Triangle Heritage</div>
+                                <div class="package-desc">4 Nights / 5 Days • Delhi, Agra (Taj Mahal) &amp; Jaipur (Amber Fort). AC Shatabdi travel with luxury heritage stays.</div>
+                            </div>
+                            <div class="package-footer">
+                                <span class="package-price">₹14,500 <small style="font-size: 0.68rem; color: #64748b;">/person</small></span>
+                                <button type="button" class="btn-package-book" onclick="bookTourPackage('Golden Triangle Heritage')">Book Package</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- VIEW 2: LIVE RUNNING STATUS (NTES SPOT YOUR TRAIN) -->
+        <section id="view-section-live" style="display: none;">
+            <div style="background: #ffffff; border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-subtle); border: 1px solid #cbd5e1;">
+                <div style="border-bottom: 2px solid var(--irctc-orange); padding-bottom: 12px; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--irctc-dark-navy);">📍 Spot Your Train — Real-Time Live Running Status (NTES)</h2>
+                    <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Indian Railways National Train Enquiry System. Commercial halt filtering active: non-stopping track waypoints excluded.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px; max-width: 760px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 260px; position: relative;">
+                        <input type="text" id="ntes-train-input" class="field-input" placeholder="Enter Train Number (e.g. 22191, 12002, 12951) or Name" value="22191" autocomplete="off" oninput="handleNtesType()" onkeydown="if(event.key==='Enter') executeLiveStatusSearch();">
+                        <div id="drop-ntes-train" class="autocomplete-dropdown"></div>
+                    </div>
+                    <select id="ntes-day-select" class="field-input" style="flex: 1; min-width: 160px;">
+                        <option value="today">Departed Today</option>
+                        <option value="yesterday">Departed Yesterday</option>
+                        <option value="tomorrow">Departing Tomorrow</option>
+                    </select>
+                    <button type="button" class="btn-search-primary" style="padding: 0 24px;" onclick="executeLiveStatusSearch()">
+                        Track Train
+                    </button>
+                </div>
+
+                <div id="ntes-result-container"></div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: SEAT & BERTH COACH LAYOUT -->
+        <section id="view-section-coach" style="display: none;">
+            <div style="background: #ffffff; border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-subtle); border: 1px solid #cbd5e1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--irctc-orange); padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--irctc-dark-navy);">🪑 Coach Layout &amp; Berth Visualizer</h2>
+                        <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Click any available berth (green) to select seat with ACID seat locking.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="coach-train-input" class="field-input" style="width: 140px;" value="12002" placeholder="Train No">
+                        <select id="coach-class-select" class="field-input" style="width: 170px;" onchange="loadCoachBayLayout()">
+                            <option value="3A">AC 3-Tier (3A)</option>
+                            <option value="2A">AC 2-Tier (2A)</option>
+                            <option value="1A">AC 1st Class (1A)</option>
+                            <option value="CC">Chair Car (CC)</option>
+                            <option value="SL">Sleeper (SL)</option>
+                        </select>
+                        <button type="button" class="btn-search-primary" style="padding: 0 16px; height: 42px;" onclick="loadCoachBayLayout()">View Coach</button>
+                    </div>
+                </div>
+
+                <div id="coach-bay-display"></div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: PNR ENQUIRY -->
+        <section id="view-section-pnr" style="display: none;">
+            <div style="background: #ffffff; border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-subtle); border: 1px solid #cbd5e1;">
+                <div style="border-bottom: 2px solid var(--irctc-orange); padding-bottom: 12px; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--irctc-dark-navy);">🎫 Passenger Name Record (PNR) Status Enquiry</h2>
+                    <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Get real-time booking confirmation status, coach berth assignment, and charting status.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
+                    <input type="text" id="pnr-input-text" class="field-input" placeholder="Enter 10-Digit PNR Number" maxlength="10" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; letter-spacing: 2px;">
+                    <button type="button" class="btn-search-primary" style="padding: 0 24px;" onclick="executePnrQuery()">Get Status</button>
+                </div>
+
+                <div id="pnr-result-display"></div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: CANCEL TICKET & REFUND -->
+        <section id="view-section-cancel" style="display: none;">
+            <div style="background: #ffffff; border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-subtle); border: 1px solid #cbd5e1;">
+                <div style="border-bottom: 2px solid var(--irctc-red); padding-bottom: 12px; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--irctc-red);">❌ Ticket Cancellation &amp; Instant Refund</h2>
+                    <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Compliant with Indian Railways cancellation rules (clerkage deductions &amp; time tier refunds). Vacated berths auto-promoted to RAC/WL passengers in strict FIFO order.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 24px;">
+                    <input type="text" id="cancel-pnr-text" class="field-input" placeholder="Enter 10-Digit PNR to Cancel" maxlength="10" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800;">
+                    <button type="button" class="btn-search-primary" style="background: var(--irctc-red); padding: 0 24px;" onclick="fetchTicketForCancel()">Find Ticket</button>
+                </div>
+
+                <div id="cancel-result-display"></div>
+            </div>
+        </section>
+
+        <!-- VIEW 6: MY ACCOUNT & MASTER PASSENGER LIST -->
+        <section id="view-section-profile" style="display: none;">
+            <div style="background: #ffffff; border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-subtle); border: 1px solid #cbd5e1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--irctc-navy); padding-bottom: 14px; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--irctc-dark-navy);">👤 My IRCTC Profile &amp; Passenger Master List</h2>
+                        <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Pre-configure family members for 1-click booking during high-demand Tatkal rush.</p>
+                    </div>
+                    <button type="button" class="btn-auth-top" onclick="logoutSession()">Sign Out</button>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: 800; color: var(--irctc-dark-navy);" id="user-display-name">Mansi Verma</div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">
+                            Username: <strong id="user-display-login">mansi</strong> • Email: <span id="user-display-email">mansi@example.com</span>
+                        </div>
+                    </div>
+                    <span style="background: #dcfce7; color: #166534; font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 999px;">AADHAAR KYC VERIFIED</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--irctc-dark-navy);">📋 Master Passenger List (Family &amp; Co-Travellers)</h3>
+                    <button type="button" class="btn-auth-top" onclick="openAddMasterModal()">+ Add Co-Passenger</button>
+                </div>
+
+                <div style="overflow-x: auto; margin-bottom: 28px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                        <thead>
+                            <tr style="background: #f1f5f9; text-align: left; text-transform: uppercase; font-size: 0.76rem; color: #475569;">
+                                <th style="padding: 10px 12px; border-bottom: 1px solid #cbd5e1;">Passenger Name</th>
+                                <th style="padding: 10px 12px; border-bottom: 1px solid #cbd5e1;">Age / Gender</th>
+                                <th style="padding: 10px 12px; border-bottom: 1px solid #cbd5e1;">Berth Preference</th>
+                                <th style="padding: 10px 12px; border-bottom: 1px solid #cbd5e1;">ID Card</th>
+                                <th style="padding: 10px 12px; border-bottom: 1px solid #cbd5e1; text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="master-passenger-table-body"></tbody>
+                    </table>
+                </div>
+
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--irctc-dark-navy); margin-bottom: 12px;">🎫 My Booked Journeys &amp; Transactions</h3>
+                <div id="user-past-bookings-list"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FLOATING ASK DISHA 2.0 AI WIDGET -->
+    <div class="ask-disha-widget">
+        <!-- CHAT DRAWER -->
+        <div class="disha-chat-drawer" id="disha-drawer">
+            <div class="disha-chat-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="/assets/ask-disha-avatar.svg" style="width: 28px; height: 28px; border-radius: 50%;">
+                    <div>
+                        <div style="font-weight: 800; font-size: 0.88rem;">Ask DISHA 2.0</div>
+                        <div style="font-size: 0.68rem; color: #93c5fd;">Indian Railways Virtual Assistant</div>
+                    </div>
+                </div>
+                <button type="button" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer;" onclick="toggleAskDishaChat()">✕</button>
+            </div>
+            <div class="disha-chat-body" id="disha-chat-messages">
+                <div class="disha-msg disha-msg-ai">
+                    Namaste! 🙏 I am <strong>Ask DISHA 2.0</strong>, your Indian Railways assistant. How can I help you today?
+                    <div class="disha-quick-chips">
+                        <span class="disha-chip" onclick="handleDishaQuickPrompt('Check PNR')">PNR Status</span>
+                        <span class="disha-chip" onclick="handleDishaQuickPrompt('Tatkal Timings')">Tatkal Timings</span>
+                        <span class="disha-chip" onclick="handleDishaQuickPrompt('Live Status 22191')">Spot 22191</span>
+                        <span class="disha-chip" onclick="handleDishaQuickPrompt('Cancellation Refund')">Refund Rules</span>
+                    </div>
+                </div>
+            </div>
+            <div class="disha-chat-footer">
+                <input type="text" class="disha-chat-input" id="disha-user-input" placeholder="Type your railway query..." onkeydown="if(event.key==='Enter') sendDishaMessage();">
+                <button type="button" class="disha-chat-send" onclick="sendDishaMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- TRIGGER BUTTON -->
+        <div class="ask-disha-trigger" onclick="toggleAskDishaChat()">
+            <img src="/assets/ask-disha-avatar.svg" alt="Ask DISHA 2.0" class="disha-avatar-img">
+            <div class="disha-trigger-text">
+                <span class="disha-trigger-title">Ask DISHA 2.0</span>
+                <span class="disha-trigger-sub">24x7 Rail AI Support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOKING & CHECKOUT MODAL -->
+    <div id="modal-checkout" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800;" id="checkout-train-title">Book Train Seats</h3>
+                    <p style="font-size: 0.76rem; color: #cbd5e1;" id="checkout-train-sub">IRCTC Secure Reservation</p>
+                </div>
+                <button type="button" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;" onclick="closeCheckoutModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Master Passenger 1-Click Fill -->
+                <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px;">
+                    <div style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">1-Click Add From Master List:</div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="checkout-master-chips"></div>
+                </div>
+
+                <form id="checkout-passenger-form" onsubmit="submitTicketReservation(event)">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 800; color: var(--irctc-dark-navy); font-size: 0.92rem;">Passenger Details</span>
+                        <button type="button" class="btn-auth-top" onclick="addPassengerRow()">+ Add Passenger</button>
+                    </div>
+
+                    <div id="passenger-rows-container"></div>
+
+                    <!-- Travel Insurance -->
+                    <div style="background: #eff6ff; padding: 12px; border-radius: var(--radius-sm); border: 1px solid #bfdbfe; margin: 14px 0;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
+                            <input type="checkbox" id="insurance-checkbox" checked onchange="recalculateFare()">
+                            <span>🛡️ Travel Insurance (₹0.35 per passenger) — Accidental cover up to ₹10,00,000</span>
+                        </label>
+                    </div>
+
+                    <!-- Payment Mode -->
+                    <div style="font-size: 0.76rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 10px;">Select Payment Gateway:</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 8px 0 16px;">
+                        <div class="class-tier-tile active" id="pay-opt-upi" onclick="selectPaymentMethod('UPI', this)">
+                            <div style="font-size: 1.2rem; text-align: center;">📱</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.8rem;">UPI / QR Code</div>
+                        </div>
+                        <div class="class-tier-tile" id="pay-opt-net" onclick="selectPaymentMethod('NET_BANKING', this)">
+                            <div style="font-size: 1.2rem; text-align: center;">🏦</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.8rem;">Net Banking</div>
+                        </div>
+                        <div class="class-tier-tile" id="pay-opt-card" onclick="selectPaymentMethod('CARDS', this)">
+                            <div style="font-size: 1.2rem; text-align: center;">💳</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.8rem;">Credit / Debit Card</div>
+                        </div>
+                        <div class="class-tier-tile" id="pay-opt-wallet" onclick="selectPaymentMethod('IMUDRA', this)">
+                            <div style="font-size: 1.2rem; text-align: center;">👛</div>
+                            <div style="text-align: center; font-weight: 700; font-size: 0.8rem;">IRCTC iMudra</div>
+                        </div>
+                    </div>
+
+                    <!-- Fare Summary -->
+                    <div style="background: #f1f5f9; padding: 12px; border-radius: var(--radius-sm); border: 1px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 0.74rem; color: #64748b; font-weight: 700;">TOTAL PAYABLE AMOUNT:</span>
+                            <div style="font-size: 1.3rem; font-weight: 900; color: var(--irctc-orange);" id="checkout-total-fare">₹0</div>
+                        </div>
+                        <button type="submit" class="btn-search-primary" style="padding: 10px 24px;">
+                            Proceed to Payment ➔
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIGITAL E-TICKET (ERS) MODAL -->
+    <div id="modal-digital-ticket" class="modal-overlay">
+        <div class="modal-box" style="max-width: 720px;">
+            <div class="modal-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800;">Electronic Reservation Slip (ERS)</h3>
+                    <p style="font-size: 0.76rem; color: #cbd5e1;">Official IRCTC Digital Boarding Ticket</p>
+                </div>
+                <button type="button" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;" onclick="closeTicketModal()">✕</button>
+            </div>
+            <div class="modal-body" id="ers-ticket-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-search-primary" style="padding: 8px 18px;" onclick="window.print()">🖨️ Print Ticket (A4)</button>
+                <button type="button" class="btn-auth-top" onclick="closeTicketModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MASTER PASSENGER MODAL -->
+    <div id="modal-add-master" class="modal-overlay">
+        <div class="modal-box" style="max-width: 460px;">
+            <div class="modal-header">
+                <h3 style="font-size: 1.15rem; font-weight: 800;">Add Co-Passenger to Master List</h3>
+                <button type="button" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;" onclick="closeAddMasterModal()">✕</button>
+            </div>
+            <form onsubmit="submitAddMasterPassenger(event)">
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">Full Name (As on Govt ID)</label>
+                        <input type="text" id="m-add-name" class="field-input" required placeholder="e.g. Ramesh Sharma">
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">Age</label>
+                            <input type="number" id="m-add-age" class="field-input" required min="1" max="120" value="28">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">Gender</label>
+                            <select id="m-add-gender" class="field-input">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="T">Transgender</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">Berth Preference</label>
+                        <select id="m-add-berth" class="field-input">
+                            <option value="NO_PREFERENCE">No Preference</option>
+                            <option value="LOWER">Lower Berth</option>
+                            <option value="MIDDLE">Middle Berth</option>
+                            <option value="UPPER">Upper Berth</option>
+                            <option value="SIDE_LOWER">Side Lower</option>
+                            <option value="SIDE_UPPER">Side Upper</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">ID Card Number</label>
+                        <input type="text" id="m-add-idno" class="field-input" placeholder="e.g. AADHAAR 8921-XXXX">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-search-primary" style="padding: 8px 18px;">Save Co-Passenger</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AUTH LOGIN MODAL -->
+    <div id="modal-auth-login" class="modal-overlay">
+        <div class="modal-box" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 style="font-size: 1.15rem; font-weight: 800;">IRCTC Individual Sign In</h3>
+                <button type="button" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;" onclick="closeAuthModal()">✕</button>
+            </div>
+            <form onsubmit="handleUserSignIn(event)">
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">User Name</label>
+                        <input type="text" id="auth-username-in" class="field-input" value="mansi" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.74rem; font-weight: 700; color: #64748b;">Password</label>
+                        <input type="password" id="auth-password-in" class="field-input" value="password123" required>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b;">
+                        Demo Accounts: <strong>mansi</strong> or <strong>demo_user</strong> (Password: <code>password123</code>)
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-search-primary" style="width: 100%;">Sign In ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toast-container"></div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <img src="/assets/irctc-logo.svg" alt="IRCTC Logo" style="height: 38px; filter: brightness(0) invert(1); margin-bottom: 10px;">
+                <p style="line-height: 1.5; color: #94a3b8;">
+                    Indian Railway Catering and Tourism Corporation Ltd. (IRCTC) is a Mini Ratna (Category-I) Central Public Sector Enterprise under the Ministry of Railways, Government of India.
+                </p>
+                <div style="margin-top: 14px; display: flex; gap: 12px; font-size: 1.1rem;">
+                    <span>🔵</span><span>🔴</span><span>📸</span><span>▶️</span>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>IRCTC TRAINS</h4>
+                <ul class="footer-links">
+                    <li><a href="javascript:void(0)" onclick="switchMainView('book')">Book Train Ticket</a></li>
+                    <li><a href="javascript:void(0)" onclick="switchMainView('live')">Spot Your Train (NTES)</a></li>
+                    <li><a href="javascript:void(0)" onclick="switchMainView('pnr')">PNR Status Enquiry</a></li>
+                    <li><a href="javascript:void(0)" onclick="switchMainView('coach')">Seat / Berth Layout</a></li>
+                    <li><a href="javascript:void(0)" onclick="switchMainView('cancel')">Ticket Cancellation &amp; Refund</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>TOURISM &amp; STAYS</h4>
+                <ul class="footer-links">
+                    <li><a href="javascript:void(0)" onclick="filterTourPackages('maharajas')">Maharajas' Express</a></li>
+                    <li><a href="javascript:void(0)" onclick="filterTourPackages('gaurav')">Bharat Gaurav Yatra</a></li>
+                    <li><a href="javascript:void(0)">Hill Railways</a></li>
+                    <li><a href="javascript:void(0)">Rail Tour Packages</a></li>
+                    <li><a href="javascript:void(0)">IRCTC Retiring Rooms</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>HELP &amp; POLICIES</h4>
+                <ul class="footer-links">
+                    <li><a href="javascript:void(0)">Tatkal Booking Rules</a></li>
+                    <li><a href="javascript:void(0)">Cancellation Refund Rules</a></li>
+                    <li><a href="javascript:void(0)">Security &amp; Phishing Advisory</a></li>
+                    <li><a href="javascript:void(0)">Divyangjan Concession</a></li>
+                    <li><a href="javascript:void(0)">Customer Care: 14646</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            Copyright © 2026 - www.irctc.co.in. All Rights Reserved. Designed &amp; Maintained by CRIS (Centre for Railway Information Systems).
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Global State
+        let currentUser = { userId: 2, username: 'mansi', fullName: 'Mansi Verma', email: 'mansi@example.com' };
+        let activeSearchMode = 'route';
+        let currentCarouselIndex = 0;
+        let carouselTimer = null;
+        let selectedPaymentMethod = 'UPI';
+        let currentCheckoutTrain = null;
+        let currentCheckoutClass = null;
+        let currentCheckoutFare = 0;
+        let masterPassengers = [];
+        let zoomLevel = 100;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initLiveClock();
+            initDatePickers();
+            initCarousel();
+            fetchTatkalStatus();
+            loadMasterPassengerList();
+            updateAuthHeader();
+        });
+
+        // 1. Live IST Clock
+        function initLiveClock() {
+            const clockEl = document.getElementById('ist-live-clock');
+            function updateTime() {
+                const now = new Date();
+                const options = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: 'short', year: 'numeric' };
+                const istStr = now.toLocaleString('en-IN', options).replace(',', '');
+                clockEl.innerText = `${istStr} IST`;
+            }
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        // 2. Date Pickers
+        function initDatePickers() {
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            document.getElementById('input-journey-date').value = tomorrow;
+            document.getElementById('input-journey-date').min = today;
+            document.getElementById('input-train-direct-date').value = tomorrow;
+            document.getElementById('input-train-direct-date').min = today;
+        }
+
+        // 3. Accessibility Zoom
+        function adjustFontSize(delta) {
+            if (delta === 0) zoomLevel = 100;
+            else zoomLevel = Math.max(85, Math.min(125, zoomLevel + delta * 5));
+            document.documentElement.style.fontSize = `${(zoomLevel / 100) * 16}px`;
+            showNotification(`Display scale: ${zoomLevel}%`, 'info');
+        }
+
+        // 4. Hero Carousel
+        function initCarousel() {
+            if (carouselTimer) clearInterval(carouselTimer);
+            carouselTimer = setInterval(() => {
+                setCarouselSlide((currentCarouselIndex + 1) % 4);
+            }, 5000);
+        }
+        function setCarouselSlide(index) {
+            currentCarouselIndex = index;
+            for (let i = 0; i < 4; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (slide) slide.classList.toggle('active', i === index);
+            }
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        // 5. Search Mode Switcher
+        function setSearchMode(mode) {
+            activeSearchMode = mode;
+            document.getElementById('mode-tab-route').classList.toggle('active', mode === 'route');
+            document.getElementById('mode-tab-train').classList.toggle('active', mode === 'train');
+            document.getElementById('search-box-route').style.display = mode === 'route' ? 'block' : 'none';
+            document.getElementById('search-box-train').style.display = mode === 'train' ? 'block' : 'none';
+        }
+
+        function swapStations() {
+            const fromIn = document.getElementById('input-from');
+            const toIn = document.getElementById('input-to');
+            const fromCode = document.getElementById('input-from-code');
+            const toCode = document.getElementById('input-to-code');
+
+            const tmpVal = fromIn.value;
+            const tmpCode = fromCode.value;
+            fromIn.value = toIn.value;
+            fromCode.value = toCode.value;
+            toIn.value = tmpVal;
+            toCode.value = tmpCode;
+        }
+
+        // 6. Main View Switcher
+        function switchMainView(view) {
+            const views = ['book', 'live', 'coach', 'pnr', 'cancel', 'profile'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-section-${v}`);
+                if (el) el.style.display = (v === view) ? 'block' : 'none';
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (view === 'coach') loadCoachBayLayout();
+            if (view === 'profile') loadUserProfileView();
+            if (view === 'live') executeLiveStatusSearch();
+        }
+
+        // 7. Tatkal Timings Status
+        async function fetchTatkalStatus() {
+            try {
+                const res = await fetch('/api/tatkal/status');
+                const data = await res.json();
+                if (data && data.isAcTatkalOpen !== undefined) {
+                    const statusStr = `Tatkal Status: AC Booking ${data.isAcTatkalOpen ? '🟢 OPEN NOW' : '⚪ Opens 10:00 AM IST'} • Non-AC Booking ${data.isNonAcTatkalOpen ? '🟢 OPEN NOW' : '⚪ Opens 11:00 AM IST'}`;
+                    document.getElementById('ticker-tatkal-content').innerText = statusStr;
+                }
+            } catch (ignored) {}
+        }
+
+        // 8. Station Autocomplete
+        let stationTimer = null;
+        function handleStationType(type) {
+            clearTimeout(stationTimer);
+            stationTimer = setTimeout(async () => {
+                const input = document.getElementById(`input-${type}`);
+                const dropdown = document.getElementById(`drop-${type}-station`);
+                const q = input.value.trim();
+                if (q.length < 2) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                try {
+                    const res = await fetch(`/api/stations/search?q=${encodeURIComponent(q)}&limit=10`);
+                    const stations = await res.json();
+                    if (!stations || stations.length === 0) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+                    dropdown.innerHTML = stations.map(s => `
+                        <div class="station-suggestion" onclick="selectStation('${type}', '${s.stationCode}', '${s.stationName}')">
+                            <span>${s.stationName} (${s.stationCode})</span>
+                            <span class="station-suggestion-code">${s.stationCode}</span>
+                        </div>
+                    `).join('');
+                    dropdown.style.display = 'block';
+                } catch (e) {
+                    dropdown.style.display = 'none';
+                }
+            }, 250);
+        }
+
+        function selectStation(type, code, name) {
+            document.getElementById(`input-${type}`).value = `${name} (${code})`;
+            document.getElementById(`input-${type}-code`).value = code;
+            document.getElementById(`drop-${type}-station`).style.display = 'none';
+        }
+
+        // 9. Direct Train Lookup Autocomplete
+        let trainTimer = null;
+        function handleDirectTrainType() {
+            clearTimeout(trainTimer);
+            trainTimer = setTimeout(async () => {
+                const input = document.getElementById('input-train-direct');
+                const dropdown = document.getElementById('drop-train-direct');
+                const q = input.value.trim();
+                if (q.length < 2) { dropdown.style.display = 'none'; return; }
+                try {
+                    const res = await fetch(`/api/trains/search?query=${encodeURIComponent(q)}`);
+                    const trains = await res.json();
+                    if (!trains || trains.length === 0) { dropdown.style.display = 'none'; return; }
+                    dropdown.innerHTML = trains.slice(0, 8).map(t => `
+                        <div class="station-suggestion" onclick="selectDirectTrain('${t.trainNumber}', '${t.trainName}')">
+                            <span><strong>${t.trainNumber}</strong> - ${t.trainName}</span>
+                            <span class="station-suggestion-code">${t.trainType || 'EXP'}</span>
+                        </div>
+                    `).join('');
+                    dropdown.style.display = 'block';
+                } catch (e) { dropdown.style.display = 'none'; }
+            }, 250);
+        }
+        function selectDirectTrain(no, name) {
+            document.getElementById('input-train-direct').value = `${no} - ${name}`;
+            document.getElementById('drop-train-direct').style.display = 'none';
+        }
+
+        // 10. Execute Train Search
+        async function triggerSearch() {
+            const resultsArea = document.getElementById('search-results-area');
+            resultsArea.innerHTML = '<div style="background: #fff; padding: 30px; text-align: center; border-radius: var(--radius-md);"><span style="font-size: 1.5rem;">🔍</span><p style="margin-top: 10px; font-weight: 700; color: var(--irctc-dark-navy);">Searching Indian Railways Real-Time Database (14,346 trains)...</p></div>';
+
+            try {
+                let url = '';
+                if (activeSearchMode === 'route') {
+                    const fromCode = document.getElementById('input-from-code').value || 'NDLS';
+                    const toCode = document.getElementById('input-to-code').value || 'BPL';
+                    const date = document.getElementById('input-journey-date').value;
+                    const quota = document.getElementById('select-quota').value;
+                    url = `/api/trains/search?from=${fromCode}&to=${toCode}&date=${date}&quota=${quota}`;
+                } else {
+                    const trainRaw = document.getElementById('input-train-direct').value;
+                    const match = trainRaw.match(/(\d{5})/);
+                    const trainNo = match ? match[1] : trainRaw.trim();
+                    const date = document.getElementById('input-train-direct-date').value;
+                    const quota = document.getElementById('select-train-direct-quota').value;
+                    url = `/api/trains/lookup?train=${trainNo}&date=${date}&quota=${quota}`;
+                }
+
+                const res = await fetch(url);
+                const trains = await res.json();
+
+                if (!trains || trains.length === 0) {
+                    resultsArea.innerHTML = `
+                        <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 40px; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">🚆</div>
+                            <h3 style="font-weight: 800; color: var(--irctc-dark-navy);">No Direct Trains Found</h3>
+                            <p style="font-size: 0.85rem; color: #64748b; margin-top: 6px;">Try changing date or searching nearby junction stations.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                resultsArea.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--irctc-dark-navy);">Available Trains (${trains.length} Direct Trains Found)</h3>
+                        <span style="font-size: 0.78rem; color: #64748b; font-weight: 600;">Indian Railways IRCTC NextGen Verified</span>
+                    </div>
+                    ${trains.map(t => renderTrainCard(t)).join('')}
+                `;
+            } catch (err) {
+                resultsArea.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-md); color: #991b1b; font-weight: 700;">Search error: ${err.message}</div>`;
+            }
+        }
+
+        function renderTrainCard(train) {
+            const classes = train.classes || ['3A', '2A', 'SL'];
+            const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+            const runsOnHtml = days.map(d => `<span class="runs-badge active">${d}</span>`).join('');
+
+            return `
+                <div class="train-card" id="train-card-${train.trainNumber}">
+                    <div class="train-header">
+                        <div>
+                            <div class="train-title-no">
+                                ${train.trainNumber} • ${train.trainName}
+                                <span style="font-size: 0.72rem; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; margin-left: 8px;">${train.trainType || 'SUPERFAST'}</span>
+                            </div>
+                            <div class="train-runs-on">Runs On: ${runsOnHtml}</div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn-auth-top" onclick="showTrainSchedule('${train.trainNumber}')">Train Schedule</button>
+                            <button type="button" class="btn-auth-top" style="background: var(--irctc-orange);" onclick="openLiveForTrain('${train.trainNumber}')">Live Status</button>
+                        </div>
+                    </div>
+
+                    <div class="train-route-visual">
+                        <div>
+                            <div class="time-large">${train.departureTime || '06:00'}</div>
+                            <div class="station-name">${train.fromStationName || 'ORIGIN'} (${train.fromStationCode || ''})</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="journey-duration-badge">${train.duration || '08h 15m'}</div>
+                            <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">──────── ➔ ────────</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="time-large">${train.arrivalTime || '14:15'}</div>
+                            <div class="station-name">${train.toStationName || 'DEST'} (${train.toStationCode || ''})</div>
+                        </div>
+                    </div>
+
+                    <!-- Classes Tier Tiles -->
+                    <div class="class-availability-grid">
+                        ${classes.map(c => `
+                            <div class="class-tier-tile" onclick="selectClassAvailability('${train.trainNumber}', '${c}', this)">
+                                <div class="class-code">
+                                    <span>${c}</span>
+                                    <span style="font-size: 0.72rem; color: #64748b;">₹${calculateFare(c)}</span>
+                                </div>
+                                <div class="class-status-badge status-available">AVAILABLE 42</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Dynamic 6-Day Matrix Container -->
+                    <div id="matrix-container-${train.trainNumber}"></div>
+                </div>
+            `;
+        }
+
+        function calculateFare(cls) {
+            const base = { '1A': 2850, 'EC': 2400, '2A': 1750, '3A': 1220, '3E': 1050, 'CC': 860, 'SL': 440, '2S': 220 };
+            return base[cls] || 950;
+        }
+
+        async function selectClassAvailability(trainNo, cls, tileEl) {
+            // Highlight tile
+            const card = document.getElementById(`train-card-${trainNo}`);
+            card.querySelectorAll('.class-tier-tile').forEach(t => t.classList.remove('active'));
+            tileEl.classList.add('active');
+
+            const container = document.getElementById(`matrix-container-${trainNo}`);
+            container.innerHTML = '<div style="font-size: 0.8rem; color: #64748b; padding: 8px 0;">Fetching 6-day availability matrix...</div>';
+
+            try {
+                const date = document.getElementById('input-journey-date').value || new Date().toISOString().split('T')[0];
+                const quota = document.getElementById('select-quota').value || 'GENERAL';
+                const res = await fetch(`/api/trains/availability?train=${trainNo}&class=${cls}&date=${date}&quota=${quota}`);
+                const data = await res.json();
+
+                const matrix = data.matrix || [
+                    { date: date, status: 'AVAILABLE - 42', code: 'AVL' },
+                    { date: 'Day +1', status: 'AVAILABLE - 28', code: 'AVL' },
+                    { date: 'Day +2', status: 'RAC 12', code: 'RAC' },
+                    { date: 'Day +3', status: 'GNWL 8', code: 'WL' },
+                    { date: 'Day +4', status: 'AVAILABLE - 16', code: 'AVL' },
+                    { date: 'Day +5', status: 'AVAILABLE - 35', code: 'AVL' }
+                ];
+
+                container.innerHTML = `
+                    <div class="day-matrix-strip">
+                        ${matrix.map((m, idx) => `
+                            <div class="day-matrix-tile ${idx === 0 ? 'selected' : ''}" onclick="selectMatrixDay('${trainNo}', '${cls}', '${m.date}', this)">
+                                <div class="matrix-date">${m.date}</div>
+                                <div class="matrix-status ${m.status.includes('AVL') ? 'status-available' : (m.status.includes('RAC') ? 'status-rac' : 'status-wl')}">${m.status}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
+                        <button type="button" class="btn-auth-top" onclick="openCoachLayoutForTrain('${trainNo}', '${cls}')">Coach Berth Map</button>
+                        <button type="button" class="btn-search-primary" style="padding: 8px 20px; font-size: 0.88rem;" onclick="openBookingCheckout('${trainNo}', '${cls}')">Book Now ➔</button>
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div style="font-size: 0.8rem; color: #dc2626;">Failed to load availability: ${err.message}</div>`;
+            }
+        }
+
+        function selectMatrixDay(trainNo, cls, date, el) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.day-matrix-tile').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // 11. Booking Checkout Flow
+        function openBookingCheckout(trainNo, cls) {
+            currentCheckoutTrain = trainNo;
+            currentCheckoutClass = cls;
+            currentCheckoutFare = calculateFare(cls);
+
+            document.getElementById('checkout-train-title').innerText = `Book Train ${trainNo} — Class ${cls}`;
+            document.getElementById('checkout-train-sub').innerText = `IRCTC NextGen Guaranteed Reservation • Base Fare: ₹${currentCheckoutFare}/passenger`;
+
+            // Populate Master Passenger 1-click pills
+            const chipsContainer = document.getElementById('checkout-master-chips');
+            chipsContainer.innerHTML = masterPassengers.map(mp => `
+                <button type="button" class="disha-chip" onclick="addMasterToCheckout('${mp.passengerName}', ${mp.age}, '${mp.gender}', '${mp.berthPreference}')">
+                    + ${mp.passengerName} (${mp.age}${mp.gender})
+                </button>
+            `).join('');
+
+            // Reset passenger rows
+            const container = document.getElementById('passenger-rows-container');
+            container.innerHTML = '';
+            addPassengerRow(currentUser.fullName, 28, 'F', 'LOWER');
+
+            recalculateFare();
+            document.getElementById('modal-checkout').classList.add('open');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('modal-checkout').classList.remove('open');
+        }
+
+        let passengerCounter = 0;
+        function addPassengerRow(name = '', age = 30, gender = 'M', berth = 'NO_PREFERENCE') {
+            passengerCounter++;
+            const container = document.getElementById('passenger-rows-container');
+            const row = document.createElement('div');
+            row.className = 'passenger-row-item';
+            row.id = `pass-row-${passengerCounter}`;
+            row.style.background = '#f8fafc';
+            row.style.border = '1px solid #cbd5e1';
+            row.style.borderRadius = '6px';
+            row.style.padding = '10px';
+            row.style.marginBottom = '10px';
+            row.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 0.74rem; font-weight: 800; color: #64748b;">PASSENGER #${container.children.length + 1}</span>
+                    ${container.children.length > 0 ? `<button type="button" style="background: none; border: none; color: #dc2626; font-weight: 700; cursor: pointer; font-size: 0.74rem;" onclick="removePassengerRow('pass-row-${passengerCounter}')">Remove ✕</button>` : ''}
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 8px;">
+                    <input type="text" class="field-input pass-name" placeholder="Passenger Full Name" value="${name}" required>
+                    <input type="number" class="field-input pass-age" placeholder="Age" value="${age}" min="1" max="120" required onchange="recalculateFare()">
+                    <select class="field-input pass-gender">
+                        <option value="M" ${gender === 'M' ? 'selected' : ''}>Male</option>
+                        <option value="F" ${gender === 'F' ? 'selected' : ''}>Female</option>
+                        <option value="T" ${gender === 'T' ? 'selected' : ''}>Trans</option>
+                    </select>
+                    <select class="field-input pass-berth">
+                        <option value="NO_PREFERENCE" ${berth === 'NO_PREFERENCE' ? 'selected' : ''}>No Berth Pref</option>
+                        <option value="LOWER" ${berth === 'LOWER' ? 'selected' : ''}>Lower Berth</option>
+                        <option value="MIDDLE" ${berth === 'MIDDLE' ? 'selected' : ''}>Middle Berth</option>
+                        <option value="UPPER" ${berth === 'UPPER' ? 'selected' : ''}>Upper Berth</option>
+                        <option value="SIDE_LOWER" ${berth === 'SIDE_LOWER' ? 'selected' : ''}>Side Lower</option>
+                        <option value="SIDE_UPPER" ${berth === 'SIDE_UPPER' ? 'selected' : ''}>Side Upper</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(row);
+            recalculateFare();
+        }
+
+        function removePassengerRow(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+            recalculateFare();
+        }
+
+        function addMasterToCheckout(name, age, gender, berth) {
+            addPassengerRow(name, age, gender, berth);
+            showNotification(`Added ${name} to passengers list`, 'info');
+        }
+
+        function recalculateFare() {
+            const count = document.querySelectorAll('.passenger-row-item').length;
+            const ins = document.getElementById('insurance-checkbox').checked ? (count * 0.35) : 0;
+            const total = (count * currentCheckoutFare) + ins;
+            document.getElementById('checkout-total-fare').innerText = `₹${Math.round(total)}`;
+        }
+
+        function selectPaymentMethod(method, el) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('#modal-checkout .class-tier-tile').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // 12. Submit Booking Reservation
+        async function submitTicketReservation(e) {
+            e.preventDefault();
+            const names = document.querySelectorAll('.pass-name');
+            const ages = document.querySelectorAll('.pass-age');
+            const genders = document.querySelectorAll('.pass-gender');
+            const berths = document.querySelectorAll('.pass-berth');
+
+            if (names.length === 0) {
+                showNotification('Please add at least one passenger.', 'error');
+                return;
+            }
+
+            const passengers = [];
+            for (let i = 0; i < names.length; i++) {
+                passengers.push({
+                    name: names[i].value.trim(),
+                    age: parseInt(ages[i].value),
+                    gender: genders[i].value,
+                    berthPreference: berths[i].value
+                });
+            }
+
+            const date = document.getElementById('input-journey-date').value || new Date().toISOString().split('T')[0];
+            const quota = document.getElementById('select-quota').value || 'GENERAL';
+
+            const payload = {
+                trainNumber: currentCheckoutTrain,
+                journeyDate: date,
+                classType: currentCheckoutClass,
+                quota: quota,
+                paymentMethod: selectedPaymentMethod,
+                userId: currentUser ? currentUser.userId : 1,
+                passengers: passengers
+            };
+
+            showNotification('Connecting to IRCTC Payment Gateway...', 'info');
+
+            try {
+                const res = await fetch('/api/bookings/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const booking = await res.json();
+                if (!res.ok) throw new Error(booking.error || 'Booking reservation failed');
+
+                closeCheckoutModal();
+                showNotification(`Ticket Confirmed! PNR: ${booking.pnr}`, 'success');
+                displayERS(booking);
+                loadUserProfileView();
+            } catch (err) {
+                showNotification(`Booking failed: ${err.message}`, 'error');
+            }
+        }
+
+        // 13. Display Electronic Reservation Slip (ERS)
+        function displayERS(b) {
+            const body = document.getElementById('ers-ticket-body');
+            body.innerHTML = `
+                <div class="ers-ticket">
+                    <div class="ers-header">
+                        <div>
+                            <img src="/assets/irctc-logo.svg" style="height: 38px;">
+                            <div style="font-weight: 800; font-size: 0.95rem; color: var(--irctc-dark-navy);">IRCTC Electronic Reservation Slip (ERS)</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 900; color: var(--irctc-orange);">PNR: ${b.pnr}</div>
+                            <span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.72rem;">BOOKING STATUS: ${b.bookingStatus || 'CONFIRMED'}</span>
+                        </div>
+                    </div>
+
+                    <table class="ers-table">
+                        <tr>
+                            <td><strong>Train No &amp; Name:</strong> ${b.trainNumber} - ${b.trainName || 'Express'}</td>
+                            <td><strong>Class:</strong> ${b.travelClass || b.classType || '3A'}</td>
+                            <td><strong>Quota:</strong> ${b.quota || 'GN'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Date of Journey:</strong> ${b.journeyDate}</td>
+                            <td><strong>From Station:</strong> ${b.fromStationCode || 'NDLS'}</td>
+                            <td><strong>To Station:</strong> ${b.toStationCode || 'BPL'}</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 14px; font-weight: 800; color: var(--irctc-dark-navy);">PASSENGER DETAILS:</div>
+                    <table class="ers-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Passenger Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Booking Status</th>
+                                <th>Coach / Seat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(b.passengers || [{ name: currentUser.fullName, age: 28, gender: 'F', bookingStatus: 'CONFIRMED', coach: 'B3', seatNumber: 42 }]).map((p, i) => `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td><strong>${p.name || p.passengerName}</strong></td>
+                                    <td>${p.age}</td>
+                                    <td>${p.gender}</td>
+                                    <td><span style="color: #15803d; font-weight: 800;">${p.bookingStatus || 'CNF'}</span></td>
+                                    <td><strong>${p.coach || 'B1'}-${p.seatNumber || (20 + i)}</strong></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border: 1px solid #cbd5e1;">
+                        <div>
+                            <span style="font-size: 0.72rem; color: #64748b; font-weight: 700;">TOTAL FARE PAID:</span>
+                            <div style="font-size: 1.15rem; font-weight: 900; color: var(--irctc-dark-navy);">₹${b.totalFare || currentCheckoutFare}</div>
+                        </div>
+                        <div style="font-size: 0.72rem; color: #64748b; text-align: right;">
+                            Payment Mode: <strong>${b.paymentMethod || 'UPI'}</strong> • Ticket ID: <strong>IRCTC-${b.pnr}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-digital-ticket').classList.add('open');
+        }
+
+        function closeTicketModal() {
+            document.getElementById('modal-digital-ticket').classList.remove('open');
+        }
+
+        // 14. Live NTES Train Running Status
+        let ntesTimer = null;
+        function handleNtesType() {
+            clearTimeout(ntesTimer);
+            ntesTimer = setTimeout(async () => {
+                const input = document.getElementById('ntes-train-input');
+                const dropdown = document.getElementById('drop-ntes-train');
+                const q = input.value.trim();
+                if (q.length < 2) { dropdown.style.display = 'none'; return; }
+                try {
+                    const res = await fetch(`/api/trains/search?query=${encodeURIComponent(q)}`);
+                    const list = await res.json();
+                    if (!list || list.length === 0) { dropdown.style.display = 'none'; return; }
+                    dropdown.innerHTML = list.slice(0, 8).map(t => `
+                        <div class="station-suggestion" onclick="selectNtesTrain('${t.trainNumber}', '${t.trainName}')">
+                            <span><strong>${t.trainNumber}</strong> - ${t.trainName}</span>
+                            <span class="station-suggestion-code">${t.trainType || 'SF'}</span>
+                        </div>
+                    `).join('');
+                    dropdown.style.display = 'block';
+                } catch (e) { dropdown.style.display = 'none'; }
+            }, 250);
+        }
+
+        function selectNtesTrain(no, name) {
+            document.getElementById('ntes-train-input').value = `${no} - ${name}`;
+            document.getElementById('drop-ntes-train').style.display = 'none';
+            executeLiveStatusSearch();
+        }
+
+        function openLiveForTrain(trainNo) {
+            switchMainView('live');
+            document.getElementById('ntes-train-input').value = trainNo;
+            executeLiveStatusSearch();
+        }
+
+        async function executeLiveStatusSearch() {
+            const raw = document.getElementById('ntes-train-input').value;
+            const match = raw.match(/(\d{5})/);
+            const trainNo = match ? match[1] : raw.trim();
+            const day = document.getElementById('ntes-day-select').value;
+            const container = document.getElementById('ntes-result-container');
+
+            container.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--irctc-dark-navy); font-weight: 700;">Connecting to GPS NTES Satellite Feed for Train ' + trainNo + '...</div>';
+
+            try {
+                const res = await fetch(`/api/trains/live-status?train=${trainNo}&day=${day}`);
+                const data = await res.json();
+
+                if (!data || data.error) {
+                    container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">Live status not found for train ${trainNo}. Please verify train number.</div>`;
+                    return;
+                }
+
+                const halts = data.halts || [];
+                container.innerHTML = `
+                    <div class="live-status-card">
+                        <div class="live-status-header">
+                            <div>
+                                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--irctc-dark-navy);">${data.trainNumber} - ${data.trainName}</h3>
+                                <div style="font-size: 0.8rem; color: #64748b; margin-top: 3px;">
+                                    Current Location: <strong style="color: var(--irctc-dark-navy);">${data.currentStation || halts[0]?.stationName || 'En Route'}</strong> • Speed: <strong>${data.speed || 95} km/h</strong>
+                                </div>
+                            </div>
+                            <span class="status-available" style="padding: 6px 14px; font-size: 0.88rem; font-weight: 800; border-radius: 999px;">
+                                ${data.delayMinutes > 0 ? `⚠️ Delayed by ${data.delayMinutes} mins` : '🟢 RUNNING ON TIME'}
+                            </span>
+                        </div>
+
+                        <div style="overflow-x: auto;">
+                            <table class="live-halt-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Station Name</th>
+                                        <th>Code</th>
+                                        <th>Sch. Arr</th>
+                                        <th>Sch. Dep</th>
+                                        <th>Delay</th>
+                                        <th>Platform</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${halts.map((h, i) => `
+                                        <tr>
+                                            <td>${i + 1}</td>
+                                            <td><strong>${h.stationName}</strong></td>
+                                            <td><code>${h.stationCode}</code></td>
+                                            <td>${h.arrivalTime || '--'}</td>
+                                            <td>${h.departureTime || '--'}</td>
+                                            <td><span style="color: ${h.delayMinutes > 0 ? '#b91c1c' : '#15803d'}; font-weight: 700;">${h.delayMinutes > 0 ? `+${h.delayMinutes}m` : 'Right Time'}</span></td>
+                                            <td><strong>PF ${h.platformNumber || 1}</strong></td>
+                                            <td>
+                                                <span class="${h.isCurrentStation ? 'badge-current' : (h.hasDeparted ? 'badge-passed' : 'badge-upcoming')}">
+                                                    ${h.isCurrentStation ? 'CURRENT HALT' : (h.hasDeparted ? 'DEPARTED' : 'UPCOMING')}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">Live status error: ${err.message}</div>`;
+            }
+        }
+
+        // 15. Coach Bay Layout & Berth Map
+        function openCoachLayoutForTrain(trainNo, cls) {
+            switchMainView('coach');
+            document.getElementById('coach-train-input').value = trainNo;
+            document.getElementById('coach-class-select').value = cls;
+            loadCoachBayLayout();
+        }
+
+        async function loadCoachBayLayout() {
+            const trainNo = document.getElementById('coach-train-input').value || '12002';
+            const cls = document.getElementById('coach-class-select').value || '3A';
+            const container = document.getElementById('coach-bay-display');
+
+            container.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--irctc-dark-navy); font-weight: 700;">Loading authentic Indian Railways bay layout for ' + cls + ' coach...</div>';
+
+            try {
+                const res = await fetch(`/api/coach/layout?train=${trainNo}&class=${cls}`);
+                const data = await res.json();
+
+                const berths = data.berths || [];
+                // Group into bays of 8 for 3A/SL or 6 for 2A
+                const baySize = (cls === '2A') ? 6 : 8;
+                const baysCount = Math.ceil(berths.length / baySize);
+
+                let baysHtml = '';
+                for (let b = 0; b < baysCount; b++) {
+                    const bayBerths = berths.slice(b * baySize, (b + 1) * baySize);
+                    const cabin = bayBerths.slice(0, cls === '2A' ? 4 : 6);
+                    const side = bayBerths.slice(cls === '2A' ? 4 : 6);
+
+                    baysHtml += `
+                        <div class="coach-bay">
+                            <div class="cabin-seats">
+                                ${cabin.map(seat => `
+                                    <div class="berth-box ${seat.isBooked ? 'berth-booked' : 'berth-available'}" onclick="selectCoachSeat('${seat.coachNumber}', ${seat.seatNumber}, '${seat.berthType}', ${seat.isBooked}, this)">
+                                        <div style="font-size: 0.85rem; font-weight: 800;">${seat.seatNumber}</div>
+                                        <div style="font-size: 0.65rem;">${seat.berthType}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="aisle-divider">AISLE</div>
+                            <div class="side-seats">
+                                ${side.map(seat => `
+                                    <div class="berth-box ${seat.isBooked ? 'berth-booked' : 'berth-available'}" onclick="selectCoachSeat('${seat.coachNumber}', ${seat.seatNumber}, '${seat.berthType}', ${seat.isBooked}, this)">
+                                        <div style="font-size: 0.85rem; font-weight: 800;">${seat.seatNumber}</div>
+                                        <div style="font-size: 0.65rem;">${seat.berthType}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = `
+                    <div class="coach-container">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                            <div style="font-weight: 800; color: var(--irctc-dark-navy);">
+                                Coach: <span style="background: var(--irctc-navy); color: #fff; padding: 2px 8px; border-radius: 4px;">B1</span> (${cls} Tier)
+                            </div>
+                            <div style="display: flex; gap: 12px; font-size: 0.74rem; font-weight: 700;">
+                                <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 12px; height: 12px; background: #ecfdf5; border: 1px solid #86efac; border-radius: 2px;"></span> Available</span>
+                                <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 12px; height: 12px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 2px;"></span> Booked</span>
+                                <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 12px; height: 12px; background: #2563eb; border-radius: 2px;"></span> Your Selection</span>
+                            </div>
+                        </div>
+                        <div class="coach-bays-wrapper">
+                            ${baysHtml}
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">Coach layout error: ${err.message}</div>`;
+            }
+        }
+
+        function selectCoachSeat(coach, seatNo, berthType, isBooked, el) {
+            if (isBooked) {
+                showNotification(`Seat ${seatNo} is already booked by another passenger.`, 'error');
+                return;
+            }
+            document.querySelectorAll('.coach-bays-wrapper .berth-box').forEach(b => b.classList.remove('berth-selected'));
+            el.classList.add('berth-selected');
+            showNotification(`Selected Seat ${seatNo} (${berthType}) in Coach ${coach}. ACID seat lock engaged.`, 'success');
+        }
+
+        // 16. PNR Status Query
+        async function executePnrQuery() {
+            const pnr = document.getElementById('pnr-input-text').value.trim();
+            const container = document.getElementById('pnr-result-display');
+            if (pnr.length !== 10) {
+                showNotification('Please enter a valid 10-digit PNR number.', 'error');
+                return;
+            }
+
+            container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--irctc-dark-navy); font-weight: 700;">Checking official Indian Railways PNR database...</div>';
+
+            try {
+                const res = await fetch(`/api/pnr?pnr=${pnr}`);
+                const data = await res.json();
+                if (!data || data.error) {
+                    container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">PNR ${pnr} not found or flushticket expired.</div>`;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 20px; margin-top: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--irctc-orange); padding-bottom: 10px; margin-bottom: 14px;">
+                            <div>
+                                <span style="font-size: 0.72rem; color: #64748b; font-weight: 800;">10-DIGIT PNR</span>
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 900; color: var(--irctc-dark-navy);">${data.pnr}</div>
+                            </div>
+                            <span class="status-available" style="padding: 4px 12px; font-weight: 800; font-size: 0.8rem; border-radius: 999px;">
+                                CHART STATUS: ${data.chartPrepared ? 'CHART PREPARED' : 'CHART NOT PREPARED'}
+                            </span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px; font-size: 0.84rem;">
+                            <div>Train: <strong>${data.trainNumber} - ${data.trainName || 'Express'}</strong></div>
+                            <div>Journey Date: <strong>${data.journeyDate}</strong></div>
+                            <div>Route: <strong>${data.fromStationCode} ➔ ${data.toStationCode}</strong></div>
+                            <div>Class: <strong>${data.travelClass || data.classType || '3A'}</strong></div>
+                        </div>
+
+                        <table class="ers-table" style="margin-bottom: 16px;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Passenger Name</th>
+                                    <th>Booking Status</th>
+                                    <th>Current Status</th>
+                                    <th>Coach / Berth</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${(data.passengers || []).map((p, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td><strong>${p.name || p.passengerName}</strong></td>
+                                        <td>${p.bookingStatus || 'CNF'}</td>
+                                        <td><span style="color: #15803d; font-weight: 800;">${p.currentStatus || 'CONFIRMED'}</span></td>
+                                        <td><strong>${p.coach || 'B1'}-${p.seatNumber || 42}</strong></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+
+                        <button type="button" class="btn-search-primary" style="padding: 8px 18px;" onclick='displayERS(${JSON.stringify(data)})'>
+                            View Official E-Ticket ➔
+                        </button>
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">PNR query failed: ${err.message}</div>`;
+            }
+        }
+
+        // 17. Ticket Cancellation & Refund
+        async function fetchTicketForCancel() {
+            const pnr = document.getElementById('cancel-pnr-text').value.trim();
+            const container = document.getElementById('cancel-result-display');
+            if (pnr.length !== 10) {
+                showNotification('Please enter a valid 10-digit PNR number.', 'error');
+                return;
+            }
+
+            container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--irctc-dark-navy); font-weight: 700;">Fetching ticket cancellation preview...</div>';
+
+            try {
+                const res = await fetch(`/api/pnr?pnr=${pnr}`);
+                const data = await res.json();
+                if (!data || data.error) {
+                    container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">PNR ${pnr} not found.</div>`;
+                    return;
+                }
+
+                const fare = data.totalFare || 1200;
+                const clerkage = 180;
+                const refund = Math.max(0, fare - clerkage);
+
+                container.innerHTML = `
+                    <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 20px; margin-top: 14px;">
+                        <h3 style="font-weight: 800; color: var(--irctc-dark-navy); margin-bottom: 10px;">Ticket Details: ${data.trainNumber} (${data.fromStationCode} ➔ ${data.toStationCode})</h3>
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px; font-size: 0.84rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span>Original Paid Fare:</span> <strong>₹${fare}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #dc2626;">
+                                <span>IRCTC Cancellation Clerkage Deduction:</span> <strong>- ₹${clerkage}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-top: 1px solid #cbd5e1; padding-top: 6px; font-size: 1rem; color: #15803d;">
+                                <span>Total Instant Refund Amount:</span> <strong>₹${refund}</strong>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-search-primary" style="background: var(--irctc-red); padding: 10px 24px;" onclick="confirmCancellation('${data.pnr}', ${refund})">
+                            Confirm Cancellation &amp; Process Refund ➔
+                        </button>
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div style="background: #fee2e2; padding: 20px; border-radius: var(--radius-sm); color: #991b1b; font-weight: 700;">Cancellation error: ${err.message}</div>`;
+            }
+        }
+
+        async function confirmCancellation(pnr, refund) {
+            if (!confirm(`Are you sure you want to cancel PNR ${pnr}? An instant refund of ₹${refund} will be credited to original payment source.`)) return;
+            try {
+                const res = await fetch('/api/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pnr: pnr })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Cancellation failed');
+
+                showNotification(`PNR ${pnr} cancelled successfully. Refund of ₹${refund} processed!`, 'success');
+                document.getElementById('cancel-result-display').innerHTML = `
+                    <div style="background: #ecfdf5; border: 1px solid #86efac; border-radius: var(--radius-sm); padding: 20px; text-align: center; color: #166534; font-weight: 800;">
+                        ✅ PNR ${pnr} has been cancelled.<br>
+                        Berths vacated and automatically promoted to RAC/WL passengers in FIFO sequence.<br>
+                        Refund Reference: <strong>IRCTC-REF-${Date.now()}</strong>
+                    </div>
+                `;
+                loadUserProfileView();
+            } catch (err) {
+                showNotification(err.message, 'error');
+            }
+        }
+
+        // 18. Ask DISHA 2.0 AI Assistant Logic
+        function toggleAskDishaChat() {
+            const drawer = document.getElementById('disha-drawer');
+            drawer.style.display = (drawer.style.display === 'flex') ? 'none' : 'flex';
+            if (drawer.style.display === 'flex') {
+                document.getElementById('disha-user-input').focus();
+            }
+        }
+
+        function openDishaWithPrompt(prompt) {
+            toggleAskDishaChat();
+            handleDishaQuickPrompt(prompt);
+        }
+
+        function handleDishaQuickPrompt(prompt) {
+            const messages = document.getElementById('disha-chat-messages');
+            messages.innerHTML += `<div class="disha-msg disha-msg-user">${prompt}</div>`;
+            messages.scrollTop = messages.scrollHeight;
+
+            setTimeout(() => {
+                let reply = '';
+                const p = prompt.toLowerCase();
+                if (p.includes('pnr')) {
+                    reply = `To check your PNR status, please type your 10-digit PNR number or navigate to our official <a href="javascript:switchMainView('pnr')">PNR Enquiry Tab</a>.`;
+                } else if (p.includes('tatkal')) {
+                    reply = `⏰ <strong>Tatkal Timings:</strong><br>• AC Classes (1A, 2A, 3A, CC, 3E): Opens at <strong>10:00 AM IST</strong> daily.<br>• Non-AC Classes (SL, 2S): Opens at <strong>11:00 AM IST</strong> daily.<br>Tip: Use our 1-click Master Passenger list for instant booking!`;
+                } else if (p.includes('22191') || p.includes('live') || p.includes('spot')) {
+                    reply = `Train <strong>22191 (Indore - Jabalpur Overnight SF Express)</strong> runs daily. You can track real-time GPS position on <a href="javascript:openLiveForTrain('22191')">Spot Your Train</a>. Commercial stops only are displayed!`;
+                } else if (p.includes('refund') || p.includes('cancellation')) {
+                    reply = `Official Refund Rules:<br>• > 48 hrs: Clerkage deduction (₹240 for 1A/EC, ₹200 for 2A, ₹180 for 3A, ₹120 for SL).<br>• 12 to 48 hrs: 25% of fare.<br>• 4 to 12 hrs: 50% of fare.<br>Instant refund processed directly to UPI / Bank!`;
+                } else {
+                    reply = `I can help you search trains, check PNR, track live running status, or book tour packages. Please select an option or specify your train number.`;
+                }
+
+                messages.innerHTML += `<div class="disha-msg disha-msg-ai">${reply}</div>`;
+                messages.scrollTop = messages.scrollHeight;
+            }, 400);
+        }
+
+        function sendDishaMessage() {
+            const input = document.getElementById('disha-user-input');
+            const q = input.value.trim();
+            if (!q) return;
+            input.value = '';
+            handleDishaQuickPrompt(q);
+        }
+
+        // 19. Master Passenger List & Profile
+        async function loadMasterPassengerList() {
+            try {
+                const res = await fetch(`/api/user/master-passengers?userId=${currentUser.userId}`);
+                masterPassengers = await res.json();
+                renderMasterTable();
+            } catch (ignored) {}
+        }
+
+        function renderMasterTable() {
+            const tbody = document.getElementById('master-passenger-table-body');
+            if (!tbody) return;
+            if (!masterPassengers || masterPassengers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #64748b;">No co-passengers saved in Master List.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = masterPassengers.map(mp => `
+                <tr>
+                    <td style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9;"><strong>${mp.passengerName}</strong></td>
+                    <td style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9;">${mp.age} Yrs / ${mp.gender === 'M' ? 'Male' : (mp.gender === 'F' ? 'Female' : 'Trans')}</td>
+                    <td style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9;"><span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-weight: 700;">${mp.berthPreference}</span></td>
+                    <td style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9;">${mp.idNumber || 'AADHAAR VERIFIED'}</td>
+                    <td style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; text-align: right;">
+                        <button type="button" style="background: none; border: none; color: #dc2626; font-weight: 700; cursor: pointer;" onclick="deleteMasterPassengerRow(${mp.id})">Delete ✕</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddMasterModal() { document.getElementById('modal-add-master').classList.add('open'); }
+        function closeAddMasterModal() { document.getElementById('modal-add-master').classList.remove('open'); }
+
+        async function submitAddMasterPassenger(e) {
+            e.preventDefault();
+            const payload = {
+                userId: currentUser.userId,
+                passengerName: document.getElementById('m-add-name').value.trim(),
+                age: parseInt(document.getElementById('m-add-age').value),
+                gender: document.getElementById('m-add-gender').value,
+                berthPreference: document.getElementById('m-add-berth').value,
+                idNumber: document.getElementById('m-add-idno').value.trim()
+            };
+            try {
+                const res = await fetch('/api/user/master-passengers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('Failed to save master passenger');
+                closeAddMasterModal();
+                showNotification('Co-passenger saved to Master List', 'success');
+                loadMasterPassengerList();
+            } catch (err) {
+                showNotification(err.message, 'error');
+            }
+        }
+
+        async function deleteMasterPassengerRow(id) {
+            if (!confirm('Remove this passenger from Master List?')) return;
+            try {
+                await fetch('/api/user/master-passengers/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id, userId: currentUser.userId })
+                });
+                showNotification('Passenger removed', 'info');
+                loadMasterPassengerList();
+            } catch (ignored) {}
+        }
+
+        async function loadUserProfileView() {
+            const container = document.getElementById('user-past-bookings-list');
+            if (!container) return;
+            container.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">Loading past bookings...</div>';
+
+            try {
+                const res = await fetch(`/api/user/bookings?userId=${currentUser.userId}`);
+                const list = await res.json();
+                if (!list || list.length === 0) {
+                    container.innerHTML = '<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 24px; text-align: center; color: #64748b;">No previous bookings recorded for this account.</div>';
+                    return;
+                }
+                container.innerHTML = list.map(b => `
+                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-subtle);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.74rem; color: #64748b; font-weight: 700;">PNR NUMBER:</span>
+                                <strong style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; color: var(--irctc-dark-navy); margin-left: 6px;">${b.pnr}</strong>
+                            </div>
+                            <span class="${b.bookingStatus === 'CANCELLED' ? 'status-wl' : 'status-available'}" style="padding: 3px 8px; font-weight: 800; font-size: 0.74rem; border-radius: 4px;">
+                                ${b.bookingStatus}
+                            </span>
+                        </div>
+                        <div style="font-weight: 800; font-size: 0.98rem; color: var(--irctc-dark-navy);">${b.trainNumber} - ${b.trainName}</div>
+                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                            ${b.fromStationCode} ➔ ${b.toStationCode} • Journey: <strong>${b.journeyDate}</strong> • Fare: <strong>₹${b.totalFare}</strong>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <button type="button" class="btn-auth-top" onclick='displayERS(${JSON.stringify(b)})'>View Digital Boarding Ticket ➔</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (ignored) {}
+        }
+
+        // 20. Auth & Modals
+        function openUserModal() {
+            if (currentUser) {
+                switchMainView('profile');
+            } else {
+                document.getElementById('modal-auth-login').classList.add('open');
+            }
+        }
+        function closeAuthModal() { document.getElementById('modal-auth-login').classList.remove('open'); }
+
+        async function handleUserSignIn(e) {
+            e.preventDefault();
+            const u = document.getElementById('auth-username-in').value.trim();
+            const p = document.getElementById('auth-password-in').value.trim();
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const user = await res.json();
+                if (!res.ok) throw new Error(user.error || 'Login failed');
+                currentUser = user;
+                updateAuthHeader();
+                closeAuthModal();
+                showNotification(`Welcome back, ${user.fullName}!`, 'success');
+                loadMasterPassengerList();
+            } catch (err) {
+                showNotification(err.message, 'error');
+            }
+        }
+
+        function updateAuthHeader() {
+            const btn = document.getElementById('top-user-btn');
+            if (currentUser) {
+                btn.innerText = `👤 ${currentUser.fullName.split(' ')[0]} (${currentUser.username})`;
+                const nameEl = document.getElementById('user-display-name');
+                if (nameEl) nameEl.innerText = currentUser.fullName;
+                const loginEl = document.getElementById('user-display-login');
+                if (loginEl) loginEl.innerText = currentUser.username;
+                const emailEl = document.getElementById('user-display-email');
+                if (emailEl) emailEl.innerText = currentUser.email;
+            } else {
+                btn.innerText = 'LOGIN / REGISTER';
+            }
+        }
+
+        function logoutSession() {
+            currentUser = null;
+            updateAuthHeader();
+            showNotification('Signed out from IRCTC session', 'info');
+            switchMainView('book');
+        }
+
+        function toggleLanguage() {
+            const btn = document.getElementById('lang-switch-btn');
+            if (btn.innerText.includes('हिंदी')) {
+                btn.innerText = '🌐 English';
+                showNotification('भाषा बदलकर हिंदी कर दी गई है।', 'info');
+            } else {
+                btn.innerText = '🌐 हिंदी';
+                showNotification('Language switched to English', 'info');
+            }
+        }
+
+        function bookTourPackage(name) {
+            showNotification(`Opening IRCTC Tourism booking portal for ${name}...`, 'info');
+            switchMainView('book');
+        }
+
+        function filterTourPackages(type) {
+            showNotification(`Showing ${type} packages`, 'info');
+            switchMainView('book');
+        }
+
+        function showTrainSchedule(trainNo) {
+            showNotification(`Loading timetable & intermediate stops for train ${trainNo}...`, 'info');
+            openLiveForTrain(trainNo);
+        }
+
+        // Notification Helper
+        function showNotification(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+</body>
+</html>
+'''
+    with open('web/index.html', 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print("✅ Successfully built web/index.html with authentic IRCTC visual identity, pictures, portraits, and workflows!")
+
+if __name__ == '__main__':
+    generate_index_html()
